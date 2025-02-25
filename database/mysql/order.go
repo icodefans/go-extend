@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"think/extend/function"
+	"github.com/icodefans/go-extend/function"
 
 	"github.com/syyongx/php2go"
 )

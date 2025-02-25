@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/syyongx/php2go"
-	"think/extend/define"
+	"github.com/icodefans/go-extend/define"
 )
 
 // 获取文件MIME信息

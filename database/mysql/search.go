@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/syyongx/php2go"
-	"think/extend/function"
+	"github.com/icodefans/go-extend/function"
 )
 
 type Search struct {

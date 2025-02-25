@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"think/extend/function"
+	"github.com/icodefans/go-extend/function"
 )
 
 type Extend [][3]string

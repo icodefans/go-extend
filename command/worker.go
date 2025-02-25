@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 
-	"think/extend/service"
+	"github.com/icodefans/go-extend/service"
 )
 
 type worker struct {

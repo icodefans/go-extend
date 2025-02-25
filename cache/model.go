@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"think/extend/database"
+	"github.com/icodefans/go-extend/database"
 )
 
 type Mode uint8

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/syyongx/php2go"
-	"think/extend/function"
+	"github.com/icodefans/go-extend/function"
 )
 
 // 本地存储

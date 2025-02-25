@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"think/extend/service"
+	"github.com/icodefans/go-extend/service"
 )
 
 type cli struct {

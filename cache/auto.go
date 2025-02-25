@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"think/extend/database"
+	"github.com/icodefans/go-extend/database"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/syyongx/php2go"

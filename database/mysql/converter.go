@@ -3,7 +3,7 @@ package mysql
 import (
 	"fmt"
 
-	"think/extend/vendor2/converter"
+	"github.com/icodefans/go-extend/vendor2/converter"
 )
 
 // mysql生成struct结构体实例

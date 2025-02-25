@@ -17,8 +17,8 @@ type eventHandlerList []EventHandlerFunc
 
 // 事件上下文配置（支持多个事件处理函数）
 var eventConfig = map[string]eventHandlerList{
-	// "think/extend/service.Error":   {debug,test},
-	// "think/extend/service.Success": {debug,test},
+	// "github.com/icodefans/go-extend/service.Error":   {debug,test},
+	// "github.com/icodefans/go-extend/service.Success": {debug,test},
 }
 
 // 事件触发

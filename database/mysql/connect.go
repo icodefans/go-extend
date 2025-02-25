@@ -2,7 +2,7 @@
 package mysql
 
 import (
-	// myLogger "think/extend/logger"
+	// myLogger "github.com/icodefans/go-extend/logger"
 	"fmt"
 	"log"
 	"os"

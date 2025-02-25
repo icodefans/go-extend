@@ -12,7 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
-	"think/extend/function"
+	"github.com/icodefans/go-extend/function"
 )
 
 // 全局数据验证器（默认中文语言包）
