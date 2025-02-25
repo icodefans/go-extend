@@ -13,7 +13,7 @@ import (
 )
 
 // 分页缓存调用
-func PageCall(mode Mode, f PageHandlerFunc, data any, page *Page, args ...any) (err error) {
+func PageCall(mode Mode, subKey string, f PageHandlerFunc, data any, page *Page, args ...any) (err error) {
 	// 异常处理
 	defer func() {
 		// 发生宕机时，获取panic传递的上下文并打印
@@ -35,7 +35,7 @@ func PageCall(mode Mode, f PageHandlerFunc, data any, page *Page, args ...any) (
 		return errors.New("分页大小未设置")
 	}
 	// 初始化缓存参数
-	init := f(INIT, page, args...)
+	init := f(INIT, subKey, page, args...)
 	if init.Error != nil {
 		return init.Error
 	} else if init.Key == "" {
@@ -78,7 +78,7 @@ func PageCall(mode Mode, f PageHandlerFunc, data any, page *Page, args ...any) (
 		return fmt.Errorf("PageCache Get Error:%s\n", err)
 	}
 	// 缓存不存在则调用方法获取
-	result := f(READ, page, args...)
+	result := f(READ, subKey, page, args...)
 	if result.Error != nil {
 		return result.Error
 	} else if result.Data == nil {
