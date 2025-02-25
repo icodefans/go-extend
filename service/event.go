@@ -1,5 +1,10 @@
 package service
 
+import (
+	"reflect"
+)
+
+// 事件参数
 type EventParam struct {
 	Key     string  `json:"key"`
 	Path    string  `json:"path"`
@@ -8,6 +13,21 @@ type EventParam struct {
 	Message *string `json:"message"`
 	Label   string  `json:"lable"`
 	Data    []any   `json:"data"`
+}
+
+// 参数提取
+func (event *EventParam) Param(params ...any) {
+	for _, arg := range event.Data {
+		valueOf := reflect.ValueOf(arg)
+		a := valueOf.Kind()
+		for _, param := range params {
+			valueOf := reflect.ValueOf(param)
+			b := valueOf.Kind()
+			if a == b {
+				param = arg
+			}
+		}
+	}
 }
 
 // 事件处理函数

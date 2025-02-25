@@ -3,6 +3,7 @@ package cache
 import (
 	"fmt"
 	"runtime"
+	"strings"
 
 	"github.com/icodefans/go-extend/database"
 )
@@ -37,7 +38,7 @@ type Page struct {
 type DataHandlerFunc func(mode Mode, args ...any) *Result
 
 // 分页缓存函数类型
-type PageHandlerFunc func(mode Mode, subKey string, page *Page, args ...any) *Result
+type PageHandlerFunc func(mode Mode, page *Page, args ...any) *Result
 
 // 缓存标识
 func Key(mark string) string {
@@ -46,7 +47,7 @@ func Key(mark string) string {
 	}
 	pc, _, _, _ := runtime.Caller(1)
 	name := runtime.FuncForPC(pc).Name()
-	// name = name[0:strings.Index(name, ".glob..")]//新操作系统会报错
+	name = name[0:strings.Index(name, ".glob..")]
 	key := fmt.Sprint(name, ".", mark)
 	return key
 }

@@ -48,6 +48,9 @@ func DataCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 		}
 		sub_key = fmt.Sprintf(":%x", md5.Sum(sub_args))
 	}
+	if init.Key == "think/app/service/structure/user.CacheDetail" {
+		fmt.Println("subkey", sub_key, args)
+	}
 	key := fmt.Sprint("data://", init.Key, sub_key)
 	rdb, ctx, _ := init.Redis.Connect()
 	// 缓存删除

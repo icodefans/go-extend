@@ -87,7 +87,7 @@ func FileDownLoad(savePath string, fileUrl string) (filePath string, e error) {
 	if mime, err := FileMime(filePath); err != nil {
 		return "", err
 	} else if ext, _ = define.MIME_EXT[mime]; ext == "" {
-		return "", fmt.Errorf("MIME(%s)信息文件后缀未定义", mime)
+		return
 	}
 	newFilePath := fmt.Sprintf("%s%s", filePath, ext)
 	// 修改文件名

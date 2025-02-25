@@ -45,6 +45,8 @@ func (config *MySQL) Connect() (gormDb *gorm.DB) {
 		config.UserName, config.PassWord, config.HostName, config.HostPort,
 		config.DataBase, config.Charset, config.Timeout,
 	)), &gorm.Config{ // GORM配置
+		SkipDefaultTransaction: true, // 禁用默认事务
+		PrepareStmt:            true, // 缓存 Prepared Statement
 		Logger: logger.New( // 日志配置
 			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
 			// myLogger.NewMyWriter(),

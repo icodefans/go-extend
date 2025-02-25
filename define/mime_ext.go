@@ -44,9 +44,6 @@ var MIME_EXT = map[string]string{
 	"image/tiff":                ".tif",
 	"image/x-targa":             ".tga",
 	"image/vnd.adobe.photoshop": ".psd",
-	"text/html; charset=utf-8":  ".svg",
-	"text/plain; charset=utf-8": ".svg",
-	"image/svg+xml":             ".svg",
 
 	// 音频文件类型的
 	"audio/mpeg":     ".mp3",

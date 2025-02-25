@@ -12,6 +12,9 @@ type Result struct {
 	Error   int    `json:"error"`
 	Message string `json:"message"`
 	Label   string `json:"-"`
+	Level   string `json:"level"` // 日志级别
+	Key     string `json:"-"`     // 事件标识
+	Path    string `json:"path"`  // 原始方法路径
 	Data    any    `json:"data"`
 }
 
@@ -48,18 +51,15 @@ func Error(error int, message string, data ...any) *Result {
 		Error:   error,
 		Message: message,
 		Label:   message,
+		Key:     Key(1), // 事件标识
+		Path:    Key(2), // 原始方法路径
 	}
-	var (
-		level = ""     // 日志级别
-		key   = Key(1) // 事件标识
-		path  = Key(2) // 原始方法路径
-	)
 	if len(data) > 0 {
 		result.Data = data[0]
-		level, _ = data[len(data)-1].(string)
+		result.Level, _ = data[len(data)-1].(string)
 	}
-	EventTrigger(key, path, error, &result.Message, result.Label, level, data...)  // trace
-	EventTrigger(path, path, error, &result.Message, result.Label, level, data...) // event
+	EventTrigger(result.Key, result.Path, error, &result.Message, result.Label, result.Level, data...)  // trace
+	EventTrigger(result.Path, result.Path, error, &result.Message, result.Label, result.Level, data...) // event
 	return &result
 }
 
@@ -69,17 +69,14 @@ func Success(message string, data ...any) *Result {
 		Error:   0,
 		Message: message,
 		Label:   message,
+		Key:     Key(1), // 事件标识
+		Path:    Key(2), // 原始方法路径
 	}
-	var (
-		level = ""     // 日志级别
-		key   = Key(1) // 事件标识
-		path  = Key(2) // 原始方法路径
-	)
 	if len(data) > 0 {
 		result.Data = data[0]
-		level, _ = data[len(data)-1].(string)
+		result.Level, _ = data[len(data)-1].(string)
 	}
-	EventTrigger(key, path, 0, &result.Message, result.Label, level, data...)  // trace
-	EventTrigger(path, path, 0, &result.Message, result.Label, level, data...) // event
+	EventTrigger(result.Key, result.Path, 0, &result.Message, result.Label, result.Level, data...)  // trace
+	EventTrigger(result.Path, result.Path, 0, &result.Message, result.Label, result.Level, data...) // event
 	return &result
 }

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/icodefans/go-extend/function"
 	"github.com/syyongx/php2go"
+	"github.com/icodefans/go-extend/function"
 )
 
 // 搜索结构
