@@ -139,8 +139,6 @@ github.com/huaweicloud/huaweicloud-sdk-go-obs v3.24.9+incompatible h1:XQVXdk+WAJ
 github.com/huaweicloud/huaweicloud-sdk-go-obs v3.24.9+incompatible/go.mod h1:l7VUhRbTKCzdOacdT4oWCwATKyvZqUOlOqr0Ous3k4s=
 github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.137 h1:gne8qQzh9wK6VVUnmfm82o2zD0gJH1txg2rdntl4Zrk=
 github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.137/go.mod h1:Y/+YLCFCJtS29i2MbYPTUlNNfwXvkzEsZKR0imY/2aY=
-github.com/icodefans/go-extend v0.0.0-20250225025826-c70199d8e007 h1:KSQrF+5ZnJWyL/B3ZUEkoFl1TtPZaGQ7R+muiiPuZZQ=
-github.com/icodefans/go-extend v0.0.0-20250225025826-c70199d8e007/go.mod h1:4g9MCiizJhxkDe0e3nCIlAlL+EqQmtsj7we13AqBP4c=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=
