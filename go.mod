@@ -11,6 +11,7 @@ require (
 	github.com/alibabacloud-go/tea-utils v1.4.5
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/blinkbean/dingtalk v1.1.3
 	github.com/go-playground/locales v0.14.1
@@ -26,7 +27,6 @@ require (
 	github.com/pquerna/otp v1.4.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/satori/go.uuid v1.2.0
-	github.com/sbzhu/weworkapi_golang v0.0.0-20210525081115-1799804a7c8d
 	github.com/sirupsen/logrus v1.9.3
 	github.com/syyongx/php2go v0.9.9
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

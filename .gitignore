@@ -6,6 +6,7 @@
 */.DS_Store
 *.exe
 main.exe
+go-extend
 think
 think.exe
 config.toml
