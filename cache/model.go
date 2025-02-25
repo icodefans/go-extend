@@ -39,6 +39,8 @@ type DataHandlerFunc func(mode Mode, args ...any) *Result
 // 分页缓存函数类型
 type PageHandlerFunc func(mode Mode, subKey string, page *Page, args ...any) *Result
 
+type PagesHandlerFunc func(mode Mode, page *Page, args ...any) *Result
+
 // 缓存标识
 func Key(mark string) string {
 	if mark == "" {
