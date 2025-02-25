@@ -52,7 +52,7 @@ func (mqClient *StreamMQClient) PutMsgBatch(streamKey string, maxLen uint32, msg
 		return "", err
 	}
 
-	fmt.Println("Reply Msg Id:", msgId)
+	// fmt.Println("Reply Msg Id:", msgId)
 	return msgId, nil
 }
 
