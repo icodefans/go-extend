@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/syyongx/php2go"
 	"github.com/icodefans/go-extend/define"
+	"github.com/syyongx/php2go"
 )
 
 // 获取文件MIME信息
@@ -87,7 +87,7 @@ func FileDownLoad(savePath string, fileUrl string) (filePath string, e error) {
 	if mime, err := FileMime(filePath); err != nil {
 		return "", err
 	} else if ext, _ = define.MIME_EXT[mime]; ext == "" {
-		return
+		return "", fmt.Errorf("MIME(%s)信息文件后缀未定义", mime)
 	}
 	newFilePath := fmt.Sprintf("%s%s", filePath, ext)
 	// 修改文件名
