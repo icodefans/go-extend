@@ -21,7 +21,7 @@ func JoinStr(i any, sep string) string {
 	return strings.Join(s_slice, sep)
 }
 
-// FirstUpper 字符串首字母大写
+// 字符串首字母大写
 func FirstUpper(s string) string {
 	if s == "" {
 		return ""
@@ -29,7 +29,7 @@ func FirstUpper(s string) string {
 	return strings.ToUpper(s[:1]) + s[1:]
 }
 
-// FirstLower 字符串首字母小写
+// 字符串首字母小写
 func FirstLower(s string) string {
 	if s == "" {
 		return ""
@@ -57,7 +57,7 @@ func StrContains(str string, strArr []string) bool {
 	return false
 }
 
-// JoinStringsInASCII 按照规则，参数名ASCII码从小到大排序后拼接
+// 按照规则，参数名ASCII码从小到大排序后拼接
 // data 待拼接的数据
 // sep 连接符
 // onlyValues 是否只包含参数值，true则不包含参数名，否则参数名和参数值均有
