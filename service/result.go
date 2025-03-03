@@ -12,9 +12,9 @@ type Result struct {
 	Error   int    `json:"error"`
 	Message string `json:"message"`
 	Label   string `json:"-"`
-	Level   string `json:"level"` // 日志级别
-	Key     string `json:"-"`     // 事件标识
-	Path    string `json:"path"`  // 原始方法路径
+	Level   string `json:"-"` // 日志级别
+	Key     string `json:"-"` // 事件标识
+	Path    string `json:"-"` // 原始方法路径
 	Data    any    `json:"data"`
 }
 
