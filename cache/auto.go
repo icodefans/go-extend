@@ -107,11 +107,9 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 	}
 	// 数据为空处理逻辑（让一个请求去生成缓存，其他请求报错）
 	if err != nil && errors.Is(err, redis.Nil) {
-		pipe := rdb.TxPipeline()        // 开启一个TxPipeline事务
-		var incr = pipe.Incr(ctx, lock) // 执行事务操作，可以通过pipe读写redis
-		pipe.Expire(ctx, lock, time.Second*lockExpire)
-		_, _ = pipe.Exec(ctx) // 通过Exec函数提交redis事务
-		if incr.Val() == 1 {
+		if incrV, err := rdb.IncrX(ctx, lock, time.Second*lockExpire); err != nil {
+			return "", err
+		} else if incrV == 1 {
 			return "", redis.Nil
 		}
 		return "", errors.New("数据载入中，请稍后再试~")
@@ -121,8 +119,7 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 		TimeOut  int64
 		JsonData string
 	}
-	err = json.Unmarshal([]byte(json_data), &data)
-	if err != nil {
+	if err := json.Unmarshal([]byte(json_data), &data); err != nil {
 		return "", err
 	}
 	// 缓存未过期，直接返回
@@ -130,13 +127,12 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 		return data.JsonData, nil
 	}
 	// 缓存过期处理逻辑（让一个请求去生成缓存，其他请求读取老缓存）
-	pipe := rdb.TxPipeline()        // 开启一个TxPipeline事务
-	var incr = pipe.Incr(ctx, lock) // 执行事务操作，可以通过pipe读写redis
-	pipe.Expire(ctx, lock, time.Second*lockExpire)
-	_, _ = pipe.Exec(ctx) // 通过Exec函数提交redis事务
-	if incr.Val() == 1 {
+	if incrV, err := rdb.IncrX(ctx, lock, time.Second*lockExpire); err != nil {
+		return "", err
+	} else if incrV == 1 {
 		return "", redis.Nil
 	}
+	// 成功返回
 	return data.JsonData, nil
 }
 
