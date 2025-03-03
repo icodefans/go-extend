@@ -97,7 +97,7 @@ func AutoCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 func autoGet(key string, redis_conf database.Redis) (json_data string, err error) {
 	var (
 		lock       = fmt.Sprint(key, ".lock")
-		lockExpire = time.Second * 30 // 单例写入锁，缓存30秒
+		lockExpire = uint32(30) // 单例写入锁，缓存30秒
 	)
 	rdb, ctx, _ := redis_conf.Connect()
 	json_data, err = rdb.Get(ctx, key).Result()
@@ -107,7 +107,7 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 	}
 	// 数据为空处理逻辑（让一个请求去生成缓存，其他请求报错）
 	if err != nil && errors.Is(err, redis.Nil) {
-		if incrV, err := rdb.IncrX(ctx, lock, time.Second*lockExpire); err != nil {
+		if incrV, err := rdb.IncrX(ctx, lock, lockExpire); err != nil {
 			return "", err
 		} else if incrV == 1 {
 			return "", redis.Nil
@@ -127,7 +127,7 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 		return data.JsonData, nil
 	}
 	// 缓存过期处理逻辑（让一个请求去生成缓存，其他请求读取老缓存）
-	if incrV, err := rdb.IncrX(ctx, lock, time.Second*lockExpire); err != nil {
+	if incrV, err := rdb.IncrX(ctx, lock, lockExpire); err != nil {
 		return "", err
 	} else if incrV == 1 {
 		return "", redis.Nil

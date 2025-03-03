@@ -43,7 +43,7 @@ func (r *Redis) Connect() (rdb *Redis, ctx context.Context, cancel context.Cance
 }
 
 // 扩展Incr方法，支持过期时间
-func (r *Redis) IncrX(ctx context.Context, key string, expiration time.Duration) (incrV uint32, err error) {
+func (r *Redis) IncrX(ctx context.Context, key string, expire uint32) (incrV uint32, err error) {
 	// Lua script to increment a counter and check if it exceeds the limit
 	luaScript := `
         local key = KEYS[1]
@@ -54,9 +54,10 @@ func (r *Redis) IncrX(ctx context.Context, key string, expiration time.Duration)
         end
         return counter`
 	keys := []string{key}
-	args := []string{fmt.Sprintf("%d", expiration)}
+	args := []string{fmt.Sprintf("%d", expire)}
 	res, err := r.Eval(ctx, luaScript, keys, args).Result()
 	if err != nil {
+		println(err.Error())
 		return 0, err
 	}
 	return uint32(res.(int64)), nil
