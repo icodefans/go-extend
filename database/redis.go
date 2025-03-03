@@ -17,27 +17,47 @@ type Redis struct {
 	Index    int32  `mapstructure:"Index"`    // 数据库
 	PoolSize int32  `mapstructure:"PoolSize"` // 连接池大小
 	Timeout  int32  `mapstructure:"Timeout"`  // 超时时间
-	rdb      *redis.Client
+	*redis.Client
 }
 
 // 实例化连接
-func (config *Redis) Connect() (rdb *redis.Client, ctx context.Context, cancel context.CancelFunc) {
-	// 单利模式
+func (r *Redis) Connect() (rdb *Redis, ctx context.Context, cancel context.CancelFunc) {
+	// 超时控制
 	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
-	if config.rdb != rdb {
-		return config.rdb, ctx, cancel
+	// 单利模式
+	if r.Client != nil {
+		return r, ctx, cancel
 	}
 	// 客户端实例化
-	config.rdb = redis.NewClient(&redis.Options{
-		Addr:        fmt.Sprintf("%s:%d", config.Host, config.Port), // 连接地址
-		Username:    "default",                                      // 用户名
-		Password:    config.Password,                                // 密码
-		DB:          int(config.Index),                              // 数据库
-		PoolSize:    int(config.PoolSize),                           // 连接池大小
-		DialTimeout: 30 * time.Second,                               // 拨号超时
-		ReadTimeout: 60 * time.Second,                               // 读取超时
-		MaxRetries:  2,                                              // 最大重试次数
+	r.Client = redis.NewClient(&redis.Options{
+		Addr:        fmt.Sprintf("%s:%d", r.Host, r.Port), // 连接地址
+		Username:    "default",                            // 用户名
+		Password:    r.Password,                           // 密码
+		DB:          int(r.Index),                         // 数据库
+		PoolSize:    int(r.PoolSize),                      // 连接池大小
+		DialTimeout: 30 * time.Second,                     // 拨号超时
+		ReadTimeout: 60 * time.Second,                     // 读取超时
+		MaxRetries:  2,                                    // 最大重试次数
 	})
-	// 成功返回
-	return config.rdb, ctx, cancel
+	return r, ctx, cancel
+}
+
+// 扩展Incr方法，支持过期时间
+func (r *Redis) IncrX(ctx context.Context, key string, expiration time.Duration) (incrV uint32, err error) {
+	// Lua script to increment a counter and check if it exceeds the limit
+	luaScript := `
+        local key = KEYS[1]
+        local expiration = tonumber(ARGV[1])
+        local counter = redis.call("incr", key)
+        if counter == 1 then
+            redis.call("expire", key, expiration)
+        end
+        return counter`
+	keys := []string{key}
+	args := []string{fmt.Sprintf("%d", expiration)}
+	res, err := r.Eval(ctx, luaScript, keys, args).Result()
+	if err != nil {
+		return 0, err
+	}
+	return uint32(res.(int64)), nil
 }
