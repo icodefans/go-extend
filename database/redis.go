@@ -57,7 +57,6 @@ func (r *Redis) IncrX(ctx context.Context, key string, expire uint32) (incrV uin
 	args := []string{fmt.Sprintf("%d", expire)}
 	res, err := r.Eval(ctx, luaScript, keys, args).Result()
 	if err != nil {
-		println(err.Error())
 		return 0, err
 	}
 	return uint32(res.(int64)), nil
