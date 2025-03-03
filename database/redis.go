@@ -64,8 +64,8 @@ func (r *Redis) IncrX(ctx context.Context, key string, expire uint32) (incrV uin
 
 // 扩展Incr方法，支持过期时间
 func (r *Redis) IncrY(ctx context.Context, key string, expire uint32) (val uint32, err error) {
-	incrCmd := r.Incr(ctx, key)
 	var incrV int64
+	incrCmd := r.Incr(ctx, key)
 	if err = incrCmd.Err(); err != nil {
 		return 0, err
 	} else if incrV, err = incrCmd.Result(); err != nil {
