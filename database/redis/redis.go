@@ -17,11 +17,14 @@ type Redis struct {
 	Index    int32  `mapstructure:"Index"`    // 数据库
 	PoolSize int32  `mapstructure:"PoolSize"` // 连接池大小
 	Timeout  int32  `mapstructure:"Timeout"`  // 超时时间
+	KeyNil   error  // 定义键不存在错误，避免业务中导入redis包
 	*redis.Client
 }
 
 // 实例化连接
 func (r *Redis) Connect() (rdb *Redis, ctx context.Context, cancel context.CancelFunc) {
+	// 参数设置
+	r.KeyNil = redis.Nil
 	// 超时控制
 	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
 	// 单利模式

@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"runtime"
 	"time"
-
-	"github.com/go-redis/redis/v8"
 )
 
 // 数据缓存调用
@@ -74,7 +72,7 @@ func DataCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 			return fmt.Errorf("DataCache JsonDecode1 Error:%s\n", err)
 		}
 		return nil
-	} else if err != nil && !errors.Is(err, redis.Nil) {
+	} else if err != nil && !errors.Is(err, rdb.KeyNil) {
 		return fmt.Errorf("DataCache Get Error:%s\n", err)
 	}
 	// 缓存自动设置，缓存不存在则调用方法获取

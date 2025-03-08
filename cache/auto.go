@@ -9,9 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	redis2 "github.com/icodefans/go-extend/database/redis"
-
-	"github.com/go-redis/redis/v8"
+	"github.com/icodefans/go-extend/database/redis"
 	"github.com/syyongx/php2go"
 )
 
@@ -72,7 +70,7 @@ func AutoCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 	value, err := autoGet(key, init.Redis)
 	if err == nil && init.Expire > 0 {
 		return json.Unmarshal([]byte(value), data)
-	} else if err != nil && !errors.Is(err, redis.Nil) {
+	} else if err != nil && !errors.Is(err, rdb.KeyNil) {
 		return fmt.Errorf("AutoCache Get Error:%s\n", err)
 	}
 	// 缓存不存在则调用方法获取
@@ -94,16 +92,16 @@ func AutoCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 }
 
 // 自动缓存获取
-func autoGet(key string, redis_conf redis2.Redis) (json_data string, err error) {
+func autoGet(key string, redis_conf redis.Redis) (json_data string, err error) {
 	rdb, ctx, _ := redis_conf.Connect()
 	json_data, err = rdb.Get(ctx, key).Result()
 	// 数据读取报错
-	if err != nil && !errors.Is(err, redis.Nil) {
+	if err != nil && !errors.Is(err, rdb.KeyNil) {
 		return "", err
 	}
 	// 数据为空处理逻辑
-	if err != nil && errors.Is(err, redis.Nil) {
-		return "", redis.Nil
+	if err != nil && errors.Is(err, rdb.KeyNil) {
+		return "", rdb.KeyNil
 	}
 	// 缓存不为空，解析缓存
 	var data struct {
@@ -118,11 +116,11 @@ func autoGet(key string, redis_conf redis2.Redis) (json_data string, err error) 
 		return data.JsonData, nil
 	}
 	// 成功返回
-	return "", redis.Nil
+	return "", rdb.KeyNil
 }
 
 // 自动缓存设置
-func autoSet(json_data []byte, key string, expire uint32, redis_conf redis2.Redis) (err error) {
+func autoSet(json_data []byte, key string, expire uint32, redis_conf redis.Redis) (err error) {
 	if expire == 0 {
 		return nil
 	}

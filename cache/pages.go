@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"runtime"
 	"time"
-
-	"github.com/go-redis/redis/v8"
 )
 
 // 分页缓存调用
@@ -74,7 +72,7 @@ func PagesCall(mode Mode, f PagesHandlerFunc, data any, page *Page, args ...any)
 	value, err := rdb.HGet(ctx, key, hash_key).Result()
 	if err == nil && init.Expire > 0 {
 		return json.Unmarshal([]byte(value), data)
-	} else if err != nil && !errors.Is(err, redis.Nil) {
+	} else if err != nil && !errors.Is(err, rdb.KeyNil) {
 		return fmt.Errorf("PagesCache Get Error:%s\n", err)
 	}
 	// 缓存不存在则调用方法获取
