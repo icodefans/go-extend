@@ -23,7 +23,7 @@ func (r *Redis) StreamMessageAdd(streamKey string, maxLen int64, values string) 
 }
 
 // 组内消息分配操作，组内每个消费者消费多少消息
-func (r *Redis) StreamMessageByGroupConsumer(streamKey string, groupName string, consumerName string, count int64, block int64, noAck bool) (messages map[string]any, err error) {
+func (r *Redis) StreamMessageByGroupConsumer(streamKey string, groupName string, consumerName string, count int64, block int64, noAck bool) (messages map[string]string, err error) {
 	conn, ctx, _ := r.Connect()
 	var result []redis.XStream
 	if result, err = conn.XReadGroup(ctx, &redis.XReadGroupArgs{
@@ -38,10 +38,14 @@ func (r *Redis) StreamMessageByGroupConsumer(streamKey string, groupName string,
 	} else if len(result) == 0 {
 		return nil, nil
 	}
-	messages = make(map[string]any)
+	messages = make(map[string]string)
 	for _, message := range result[0].Messages {
-		if value, ok := message.Values["values"]; ok {
-			messages[message.ID] = value
+		if value, ok := message.Values["values"]; !ok {
+			continue
+		} else if val, ok := value.(string); !ok {
+			continue
+		} else {
+			messages[message.ID] = val
 		}
 	}
 	// 返回消息转换
