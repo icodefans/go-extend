@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/icodefans/go-extend/database"
+	"github.com/icodefans/go-extend/database/redis"
 )
 
 type Mode uint8
@@ -23,7 +23,7 @@ type Result struct {
 	Key    string
 	Expire uint32
 	// Close  bool
-	Redis database.Redis
+	Redis redis.Redis
 	Error error
 }
 

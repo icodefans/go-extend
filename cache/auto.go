@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/icodefans/go-extend/database"
+	redis2 "github.com/icodefans/go-extend/database/redis"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/syyongx/php2go"
@@ -94,7 +94,7 @@ func AutoCall(mode Mode, f DataHandlerFunc, data any, args ...any) (err error) {
 }
 
 // 自动缓存获取
-func autoGet(key string, redis_conf database.Redis) (json_data string, err error) {
+func autoGet(key string, redis_conf redis2.Redis) (json_data string, err error) {
 	rdb, ctx, _ := redis_conf.Connect()
 	json_data, err = rdb.Get(ctx, key).Result()
 	// 数据读取报错
@@ -122,7 +122,7 @@ func autoGet(key string, redis_conf database.Redis) (json_data string, err error
 }
 
 // 自动缓存设置
-func autoSet(json_data []byte, key string, expire uint32, redis_conf database.Redis) (err error) {
+func autoSet(json_data []byte, key string, expire uint32, redis_conf redis2.Redis) (err error) {
 	if expire == 0 {
 		return nil
 	}

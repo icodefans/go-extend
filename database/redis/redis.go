@@ -1,5 +1,5 @@
 // Redis
-package database
+package redis
 
 import (
 	"context"
