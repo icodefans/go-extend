@@ -11,7 +11,7 @@ import (
 )
 
 // 分页缓存调用
-func PageCall(mode Mode, subKey string, f PageHandlerFunc, data any, page *Page, args ...any) (err error) {
+func PageCall(mode Mode, f PageHandlerFunc, subKey string, data any, page *Page, args ...any) (err error) {
 	// 异常处理
 	defer func() {
 		// 发生宕机时，获取panic传递的上下文并打印
