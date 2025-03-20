@@ -42,13 +42,11 @@ type PageHandlerFunc func(mode Mode, subKey string, page *Page, args ...any) *Re
 type PagesHandlerFunc func(mode Mode, page *Page, args ...any) *Result
 
 // 缓存标识
-func Key(mark string) string {
-	if mark == "" {
-		panic("缓存标识mark参数不能为空")
-	}
+func Key(mark *string) string {
 	pc, _, _, _ := runtime.Caller(1)
-	name := runtime.FuncForPC(pc).Name()
-	// name = name[0:strings.Index(name, ".glob..")]//新操作系统会报错
-	key := fmt.Sprint(name, ".", mark)
+	key := runtime.FuncForPC(pc).Name()
+	if mark != nil {
+		key = fmt.Sprint(key, "_", *mark)
+	}
 	return key
 }
