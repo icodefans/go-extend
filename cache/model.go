@@ -45,7 +45,7 @@ type PagesHandlerFunc func(mode Mode, page *Page, args ...any) *Result
 func Key(mark *string) string {
 	pc, _, _, _ := runtime.Caller(1)
 	key := runtime.FuncForPC(pc).Name()
-	if mark != nil {
+	if mark != nil && *mark != "" {
 		key = fmt.Sprint(key, "_", *mark)
 	}
 	return key
