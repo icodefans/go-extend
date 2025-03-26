@@ -7,9 +7,9 @@ import (
 )
 
 // mysql生成struct结构体实例
-func (config *MySQL) Table2Struct(tableName string) error {
+func (config *MySQL) Table2Struct(tableName string) (structContent string, err error) {
 	if tableName == "" {
-		return fmt.Errorf("表名不能为空")
+		return structContent, fmt.Errorf("表名不能为空")
 	}
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -37,7 +37,7 @@ func (config *MySQL) Table2Struct(tableName string) error {
 		// ColumnComment: true,
 	})
 	// 开始迁移转换
-	err := t2t.
+	structContent, err = t2t.
 		// 指定某个表,如果不指定,则默认全部表都迁移
 		Table(tableName).
 		// 表前缀
@@ -57,5 +57,5 @@ func (config *MySQL) Table2Struct(tableName string) error {
 		// 执行
 		Run()
 
-	return err
+	return structContent, err
 }

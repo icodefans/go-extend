@@ -126,20 +126,20 @@ func (t *Table2Struct) Config(c *T2tConfig) *Table2Struct {
 	return t
 }
 
-func (t *Table2Struct) Run() error {
+func (t *Table2Struct) Run() (structContent string, err error) {
 	if t.config == nil {
 		t.config = new(T2tConfig)
 	}
 	// 链接mysql, 获取db对象
 	t.dialMysql()
 	if t.err != nil {
-		return t.err
+		return "", t.err
 	}
 
 	// 获取表和字段的shcema
 	tableColumns, err := t.getColumns()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// fmt.Println(tableColumns)
@@ -153,7 +153,6 @@ func (t *Table2Struct) Run() error {
 	}
 
 	// 组装struct
-	var structContent string
 	for tableRealName, item := range tableColumns {
 		// 去除前缀
 		if t.prefix != "" {
@@ -202,7 +201,7 @@ func (t *Table2Struct) Run() error {
 	f, err := os.Create(filePath)
 	if err != nil {
 		fmt.Println("Can not write file")
-		return err
+		return "", err
 	}
 	defer f.Close()
 
@@ -211,7 +210,7 @@ func (t *Table2Struct) Run() error {
 	cmd := exec.Command("gofmt", "-w", filePath)
 	cmd.Run()
 
-	return nil
+	return "", nil
 }
 
 func (t *Table2Struct) dialMysql() {
@@ -241,7 +240,7 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 	tableColumns = make(map[string][]column)
 	// sql
 	var sqlStr = `SELECT COLUMN_NAME,DATA_TYPE,COLUMN_TYPE,IS_NULLABLE,TABLE_NAME,CHARACTER_MAXIMUM_LENGTH,COLUMN_COMMENT
-		FROM information_schema.COLUMNS 
+		FROM information_schema.COLUMNS
 		WHERE table_schema = DATABASE()`
 	// 是否指定了具体的table
 	if t.table != "" {
@@ -292,7 +291,7 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 			// }
 		}
 		if t.enableJsonTag && col.DataType == "string" {
-			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty,min=0,max=%s\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.CharMaxLen, col.ColumnComment)
+			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty,min=0,max=%d\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.CharMaxLen, col.ColumnComment)
 		} else if t.enableJsonTag && col.DataType == "uint64" {
 			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s,string\" validate:\"omitempty\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
 		} else if t.enableJsonTag {
