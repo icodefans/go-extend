@@ -97,3 +97,14 @@ func FileDownLoad(savePath string, fileUrl string) (filePath string, e error) {
 	// 成功返回
 	return newFilePath, nil
 }
+
+// 检测文件是否存在
+func FileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
+}
