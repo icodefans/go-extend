@@ -5,11 +5,11 @@ import (
 )
 
 // 移除键值对中为nil的项
-func MapFilterNull(data *map[string]any) *map[string]any {
-	for key, value := range *data {
+func MapFilterNull(data map[string]any) map[string]any {
+	for key, value := range data {
 		vi := reflect.ValueOf(value)
 		if vi.Kind() == reflect.Ptr && vi.IsNil() {
-			delete(*data, key)
+			delete(data, key)
 		}
 	}
 	return data
