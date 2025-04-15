@@ -151,3 +151,16 @@ func (search *Search) OrderParse(fields ...string) (orderSQL string, err error) 
 	}
 	return orderSQL, nil
 }
+
+// 自定义like条件解析逻辑
+func (search *Search) LikeParse(keyword string, fields ...string) (likeSQL string) {
+	if keyword == "" || len(fields) == 0 {
+		return ""
+	}
+	likeFields := []string{}
+	for _, name := range fields {
+		likeFields = append(likeFields, fmt.Sprintf("%s like '%%%s%%'", name, keyword))
+	}
+	return strings.Join(likeFields, " OR ")
+}
+
