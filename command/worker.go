@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/icodefans/go-extend/service"
@@ -11,7 +12,7 @@ type worker struct {
 }
 
 // 任务处理程序类型定义
-type workerHander func() *service.Result
+type workerHander func(ctx *context.Context) *service.Result
 
 var workerInstance *worker
 
@@ -33,7 +34,8 @@ func (w *worker) Add(rule string, hander workerHander) {
 func (w *worker) Match(rule string) (result *service.Result) {
 	if hander, ok := w.router[rule]; !ok {
 		return service.Error(102, fmt.Sprintf("没有匹配到路由规则(%s)", rule), nil, "error")
-	} else {
-		return hander()
+	} else if ctx := context.Background(); true {
+		return hander(&ctx)
 	}
+	return
 }
