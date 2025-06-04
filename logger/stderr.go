@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// 标准错误输出
+// 标准错误日志记录
 func StdErrAdd(content, label string) {
 	// 日志前缀
 	if label == "" {

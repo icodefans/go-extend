@@ -39,7 +39,7 @@ func NewRotateLogrus(logName string) *logrus.Logger {
 	logger.SetOutput(&lumberjack.Logger{
 		Filename:   filePath, // 日志文件路径
 		MaxSize:    10,       // 单个日志文件最大大小（MB）
-		MaxBackups: 3,        // 最多保留的旧日志文件数量
+		MaxBackups: 0,        // 最多保留的旧日志文件数量
 		MaxAge:     28,       // 日志文件最多保留的天数
 		Compress:   false,    // 是否压缩旧日志文件
 	})
