@@ -58,6 +58,7 @@ func Error(error int, message string, data ...any) *Result {
 		result.Data = data[0]
 		result.Level, _ = data[len(data)-1].(string)
 	}
+	EventTrigger(result.Key, result.Path, error, &result.Message, result.Label, result.Level, data...)  // trace
 	EventTrigger(result.Path, result.Path, error, &result.Message, result.Label, result.Level, data...) // event
 	return &result
 }
@@ -75,6 +76,7 @@ func Success(message string, data ...any) *Result {
 		result.Data = data[0]
 		result.Level, _ = data[len(data)-1].(string)
 	}
+	EventTrigger(result.Key, result.Path, 0, &result.Message, result.Label, result.Level, data...)  // trace
 	EventTrigger(result.Path, result.Path, 0, &result.Message, result.Label, result.Level, data...) // event
 	return &result
 }
