@@ -1,6 +1,17 @@
 // 数组函数
 package function
 
+// 从切片中查找元素
+// 泛型约束 comparable:comparable,any:所有类型
+func InArray[T comparable](needle T, haystack []T) bool {
+	for _, v := range haystack {
+		if v == needle {
+			return true
+		}
+	}
+	return false
+}
+
 // 检查数组中是否存在某个值
 func InArrayString(needle string, haystack []string) bool {
 	for _, value := range haystack {

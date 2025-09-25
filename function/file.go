@@ -1,8 +1,10 @@
 package function
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"os"
@@ -107,4 +109,51 @@ func FileExists(filename string) bool {
 		}
 	}
 	return true
+}
+
+// 文件后缀获取
+func FileGetExt(fileUrl string) (ext string) {
+	if ext = filepath.Ext(fileUrl); ext == "" {
+		return ext
+	} else if index := strings.Index(ext, "?"); index != -1 {
+		return ext[:index]
+	}
+	return ext
+}
+
+// 远程文件Mime文件信息获取
+func HttpFileMime(url string) (string, error) {
+	// 发送 HEAD 请求获取响应头信息（比 GET 更高效）
+	resp, err := http.Head(url)
+	if err != nil {
+		return "", fmt.Errorf("请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 从响应头中获取 Content-Type
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != "" {
+		// 解析并返回主类型
+		mediaType, _, err := mime.ParseMediaType(contentType)
+		if err == nil {
+			return mediaType, nil
+		}
+	}
+
+	// 如果响应头没有提供，尝试通过 GET 请求获取部分内容来检测
+	resp, err = http.Get(url)
+	if err != nil {
+		return "", fmt.Errorf("GET 请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取前 512 字节用于检测 MIME 类型
+	buffer := make([]byte, 512)
+	n, err := io.ReadFull(resp.Body, buffer)
+	if err != nil && err != io.EOF && !errors.Is(err, io.ErrUnexpectedEOF) {
+		return "", fmt.Errorf("读取内容失败: %v", err)
+	}
+
+	// 使用 http.DetectContentType 检测 MIME 类型
+	return http.DetectContentType(buffer[:n]), nil
 }
