@@ -1,14 +1,19 @@
 package service
 
+import (
+	"time"
+)
+
 // 事件参数
 type EventParam struct {
-	Key     string  `json:"key"`
-	Path    string  `json:"path"`
-	Level   string  `json:"level"`
-	Error   int     `json:"error"`
-	Message *string `json:"message"`
-	Label   string  `json:"lable"`
-	Data    []any   `json:"data"`
+	Key       string    `json:"key"`
+	Path      string    `json:"path"`
+	Level     string    `json:"level"`
+	Error     int       `json:"error"`
+	StartTime time.Time `json:"start_time"`
+	Message   *string   `json:"message"`
+	Label     string    `json:"lable"`
+	Data      []any     `json:"data"`
 }
 
 // 事件处理函数
@@ -29,13 +34,14 @@ func EventTrigger(key, path string, error int, message *string, label, level str
 	}
 	for _, f := range funcList {
 		f(&EventParam{
-			Key:     key,
-			Path:    path,
-			Error:   error,
-			Level:   level,
-			Message: message,
-			Label:   label,
-			Data:    data,
+			Key:       key,
+			Path:      path,
+			Error:     error,
+			Level:     level,
+			StartTime: time.Now(),
+			Message:   message,
+			Label:     label,
+			Data:      data,
 		})
 	}
 }
