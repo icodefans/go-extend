@@ -2,6 +2,7 @@
 package function
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -32,6 +33,35 @@ func DayBetweenTime(dateTime time.Time, timeZone string) (beginTime, endTime *ti
 	return &beginDate, &endDate, nil
 }
 
+// 获取指定时间当月开始结束时间
+func MonthBetweenTime(dateTime time.Time, timeZone string) (beginTime, endTime *time.Time, err error) {
+	// 加载时区信息
+	local, err := time.LoadLocation(timeZone)
+	if err != nil {
+		return nil, nil, err
+	}
+	// 时间设置时区
+	dateTime = dateTime.In(local)
+	// 开始结束时间
+	beginDate := time.Date(dateTime.Year(), dateTime.Month(), 1, 0, 0, 0, 0, dateTime.Location())
+	endDate := beginDate.AddDate(0, 1, 0).Add(-time.Second * 1)
+	// 成功返回
+	return &beginDate, &endDate, nil
+}
+
+// 时间时区修改
+func TimeZoneUpdate(dateTime *time.Time, timeZone string) (err error) {
+	// 加载时区信息
+	local, err := time.LoadLocation(timeZone)
+	if err != nil {
+		return err
+	}
+	// 时间设置时区
+	*dateTime = (*dateTime).In(local)
+	// 成功返回
+	return nil
+}
+
 // 工作日天数增加（去除周六周日）
 func WeekDayAdd(dateTime time.Time, number uint32) *time.Time {
 	for i := 0; i < int(number); i++ {
@@ -52,4 +82,10 @@ func Strtotime(dateStr, timeZone string) (*time.Time, error) {
 	} else {
 		return &t, nil
 	}
+}
+
+// 获取秒级时长
+func TimeSecondDuration(second uint32) (duration time.Duration) {
+	duration, _ = time.ParseDuration(fmt.Sprintf("+%ds", second)) // s:秒,m:分,h:小时
+	return duration
 }
