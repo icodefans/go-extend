@@ -23,11 +23,11 @@ func OrderParse(order Order, fields ...string) (orderSQL string, err error) {
 			return "", fmt.Errorf("order操作符不在选择范围内[asc,desc]")
 		} else if len(fields) > 0 && !php2go.InArray(item[0], fields) {
 			return "", fmt.Errorf("order不支持该字段:%v", item[0])
-		} else if field := strings.Split(item[0], "."); len(field) > 2 {
+		} else if field := strings.Split(item[0], "."); !strings.Contains(item[0], "->") && len(field) > 2 {
 			return "", fmt.Errorf("字段点分隔不符合规范:%v", item[0])
-		} else if len(field) == 1 {
+		} else if !strings.Contains(item[0], "->") && len(field) == 1 {
 			item[0] = fmt.Sprintf("`%s`", item[0])
-		} else if len(field) == 2 {
+		} else if !strings.Contains(item[0], "->") && len(field) == 2 {
 			item[0] = fmt.Sprintf("`%s`.`%s`", field[0], field[1])
 		}
 		if orderSQL != "" {
