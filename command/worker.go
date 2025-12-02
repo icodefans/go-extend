@@ -12,7 +12,7 @@ type worker struct {
 }
 
 // 任务处理程序类型定义
-type workerHander func(ctx *context.Context) *service.Result
+type workerHander func(ctx *context.Context, args []string) *service.Result
 
 var workerInstance *worker
 
@@ -31,11 +31,11 @@ func (w *worker) Add(rule string, hander workerHander) {
 }
 
 // 路由匹配运行
-func (w *worker) Match(rule string) (result *service.Result) {
+func (w *worker) Match(rule string, args ...string) (result *service.Result) {
 	if hander, ok := w.router[rule]; !ok {
-		return service.Error(102, fmt.Sprintf("没有匹配到路由规则(%s)", rule), nil, "error")
+		return service.Error(301, fmt.Sprintf("没有匹配到路由规则(%s)", rule), nil, "error")
 	} else if ctx := context.Background(); true {
-		return hander(&ctx)
+		return hander(&ctx, args)
 	}
 	return
 }
