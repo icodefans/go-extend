@@ -1,6 +1,6 @@
 module github.com/icodefans/go-extend
 
-go 1.24.9
+go 1.23.2
 
 require (
 	github.com/alibabacloud-go/captcha-20230305 v1.1.2
