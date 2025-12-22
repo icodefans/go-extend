@@ -47,7 +47,7 @@ func (w *cli) Match(rule string) (result *service.Result) {
 
 		// 监听进程退出信号(TERM, HUP, INT, QUIT, KILL, USR1, or USR2)
 		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGUSR2)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		sig := <-c
 
 		// 进程上下文取消
