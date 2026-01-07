@@ -71,6 +71,12 @@ func WhereParse(where Where, fields ...string) (whereSQL string, vals []any, err
 			} else {
 				vals = append(vals, item[2])
 			}
+		} else if fileds := strings.Split(field, "->"); action == "search" && len(fileds) == 2 {
+			wen, action = "", ""
+			subField := strings.Trim(fileds[1], `'`)
+			subField = strings.TrimLeft(subField, "$.")
+			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_SEARCH(%s, 'one', ?, NULL, '$[*].%s') IS NOT NULL`, fileds[0], fileds[0], subField)
+			vals = append(vals, item[2])
 		} else {
 			field = fmt.Sprintf("%s ", field)
 			vals = append(vals, item[2])
