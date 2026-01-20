@@ -41,7 +41,7 @@ type dingTalkData struct {
  * @param  bool    $at_all
  * @return bool|string
  */
-func (config *DingTalk) Markdown(title, text, atMobiles string, isAtAll bool) {
+func (config *DingTalk) Markdown(title, text, atMobiles string, isAtAll bool) (string, error) {
 	// 组织数据
 	data := dingTalkData{
 		MsgType: "markdown",
@@ -61,8 +61,9 @@ func (config *DingTalk) Markdown(title, text, atMobiles string, isAtAll bool) {
 	sign := sign(timestamp, config.Secret)
 
 	// 请求发送
-	url := fmt.Sprintf("https://oapi.dingtalk.com/robot/send?access_token=%s&timestamp=%d&sign=%s", config.Token, timestamp, sign)
-	curl(url, string(json_data))
+	// url := fmt.Sprintf("https://oapi.dingtalk.com/robot/send?access_token=%s&timestamp=%d&sign=%s", config.Token, timestamp, sign)
+	url := fmt.Sprintf("%s&timestamp=%d&sign=%s", config.Token, timestamp, sign)
+	return curl(url, string(json_data))
 }
 
 // 请求参数签名
