@@ -6,53 +6,38 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
 	"time"
 )
 
 // 分页缓存调用
 func PagesCall(mode Mode, f PagesHandlerFunc, data any, page *Page, args ...any) (err error) {
-	// 异常处理
-	defer func() {
-		// 发生宕机时，获取panic传递的上下文并打印
-		rec := recover()
-		if rec != nil {
-			err = fmt.Errorf("分页缓存调用异常")
-			switch rec.(type) {
-			case runtime.Error: // 运行时错误
-				fmt.Println("runtime error:", rec)
-			default: // 非运行时错误
-				fmt.Println("error:", rec)
-			}
-		}
-	}()
 	// 验证分页参数
 	if page != nil && page.Number == 0 {
 		return errors.New("分页编号未设置")
 	} else if page != nil && page.Limit == 0 {
 		return errors.New("分页大小未设置")
 	}
-	// 初始化缓存参数
+	// 缓存参数初始化
 	init := f(INIT, page, args...)
 	if init.Error != nil {
 		return init.Error
 	} else if init.Key == "" {
 		return errors.New("缓存方法未设置缓存标识")
-	} else if init.Redis.Host == "" {
+	} else if init.Redis.Client == nil {
 		return errors.New("缓存方法未设置缓存配置")
 	} else if init.Data != nil {
-		return errors.New("缓存配置未返回")
+		return errors.New("缓存初始化时不能返回数据")
 	}
-	var sub_key string
+	var argKey string
 	if len(args) > 0 {
 		sub_args, err := json.Marshal(args)
 		if err != nil {
 			return errors.New("缓存方法参数序列化错误")
 		}
-		sub_key = fmt.Sprintf("%x", md5.Sum(sub_args))
+		argKey = fmt.Sprintf(":%x", md5.Sum(sub_args))
 	}
 	var path = fmt.Sprintf("page://%s", init.Key)
-	key := fmt.Sprintf("%s:%s", path, sub_key)
+	key := fmt.Sprintf("%s%s", path, argKey)
 	rdb, ctx, _ := init.Redis.Connect()
 	// 缓存删除
 	if mode == DELETE {

@@ -3,10 +3,10 @@ package storage
 // 引入依赖包
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/huaweicloud/huaweicloud-sdk-go-obs/obs"
+	"github.com/icodefans/go-extend/function"
 	"github.com/syyongx/php2go"
 )
 
@@ -42,7 +42,7 @@ func (huawei HuaWei) UploadLoclFile(savePath, filePath string) (objectKey string
 	if savePath != "" {
 		saveDir += strings.Trim(savePath, "/") + "/"
 	}
-	fileName := php2go.Uniqid("") + strings.ToLower(filepath.Ext(filePath))
+	fileName := php2go.Uniqid("") + strings.ToLower(function.FileGetExt(filePath))
 	objectKey = fmt.Sprint(saveDir, fileName)
 
 	// 上传文件

@@ -6,102 +6,78 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
 	"time"
 )
 
 // 分页缓存调用
 func PageCall(mode Mode, f PageHandlerFunc, subKey string, data any, page *Page, args ...any) (err error) {
-	// 异常处理
-	defer func() {
-		// 发生宕机时，获取panic传递的上下文并打印
-		rec := recover()
-		if rec != nil {
-			err = fmt.Errorf("分页缓存调用异常")
-			switch rec.(type) {
-			case runtime.Error: // 运行时错误
-				fmt.Println("runtime error:", rec)
-			default: // 非运行时错误
-				fmt.Println("error:", rec)
-			}
-		}
-	}()
 	// 验证分页参数
-	if page != nil && page.Number == 0 {
-		return errors.New("分页编号未设置")
-	} else if page != nil && page.Limit == 0 {
-		return errors.New("分页大小未设置")
+	if page != nil && page.Number <= 0 {
+		return fmt.Errorf("PageCall PAGE Error1:分页编号未设置")
+	} else if page != nil && page.Limit <= 0 {
+		return fmt.Errorf("PageCall PAGE Error2:分页大小未设置")
 	}
-	// 初始化缓存参数
+	// 缓存参数初始化
 	init := f(INIT, subKey, page, args...)
 	if init.Error != nil {
-		return init.Error
+		return fmt.Errorf("PageCall INIT Error1:%s", init.Error)
 	} else if init.Key == "" {
-		return errors.New("缓存方法未设置缓存标识")
-	} else if init.Redis.Host == "" {
-		return errors.New("缓存方法未设置缓存配置")
+		return fmt.Errorf("PageCall INIT Error2:缓存方法未设置缓存标识")
+	} else if init.Redis.Client == nil {
+		return fmt.Errorf("PageCall INIT Error3:缓存方法未设置缓存配置")
 	} else if init.Data != nil {
-		return errors.New("缓存配置未返回")
+		return fmt.Errorf("PageCall INIT Error4:缓存初始化时不能返回数据")
 	}
-	var sub_key string
-	if len(args) > 0 {
-		sub_args, err := json.Marshal(args)
-		if err != nil {
-			return errors.New("缓存方法参数序列化错误")
-		}
-		sub_key = fmt.Sprintf("%x", md5.Sum(sub_args))
+	var argKey string
+	if len(args) == 0 {
+		// break
+	} else if argsJson, err := json.Marshal(args); err != nil {
+		return fmt.Errorf("PageCall INIT Error5:缓存方法参数序列化错误，%s", err)
+	} else {
+		argKey = fmt.Sprintf(":%x", md5.Sum(argsJson))
 	}
-	var path = fmt.Sprintf("page://%s", init.Key)
-	key := fmt.Sprintf("%s:%s", path, sub_key)
+	path := fmt.Sprintf("page://%s", init.Key)
+	key := fmt.Sprintf("%s%s", path, argKey)
+	expire := time.Duration(1) * time.Millisecond
+	if init.Expire > 0 {
+		expire = time.Duration(init.Expire) * time.Second
+	}
+	hashKey := "0:0"
+	if page != nil {
+		hashKey = fmt.Sprintf("%d:%d", page.Number, page.Limit)
+	}
 	rdb, ctx, _ := init.Redis.Connect()
-	// 缓存删除
-	if mode == DELETE {
-		keys, err := rdb.Keys(ctx, fmt.Sprintf("%s*", path)).Result()
-		if err != nil {
-			return fmt.Errorf("PageCache Del Error:%s\n", err)
-		} else if len(keys) > 0 {
-			rdb.Del(ctx, keys...)
-		}
+	// 缓存数据删除
+	if mode != DELETE {
+		// break
+	} else if _, err := rdb.DelX(ctx, fmt.Sprintf("%s*", path)); err != nil {
+		return fmt.Errorf("PageCall DELETE Error1:%s", err)
+	} else {
 		return nil
 	}
-	// 缓存获取,支持缓存关闭
-	hash_key := "0"
-	if page != nil {
-		hash_key = fmt.Sprint(page.Number, ":", page.Limit)
+	// 缓存数据获取，支持缓存关闭
+	if jsonData, err := rdb.HGet(ctx, key, hashKey).Result(); err != nil && !errors.Is(err, rdb.KeyNil) {
+		return fmt.Errorf("PageCall GET Error1:%s", err)
+	} else if init.Expire == 0 || errors.Is(err, rdb.KeyNil) {
+		// break
+	} else if err := json.Unmarshal([]byte(jsonData), data); err != nil {
+		return fmt.Errorf("PageCall GET Error2:%s", err)
+	} else {
+		return nil
 	}
-	value, err := rdb.HGet(ctx, key, hash_key).Result()
-	if err == nil && init.Expire > 0 {
-		return json.Unmarshal([]byte(value), data)
-	} else if err != nil && !errors.Is(err, rdb.KeyNil) {
-		return fmt.Errorf("PageCache Get Error:%s\n", err)
-	}
-	// 缓存不存在则调用方法获取
-	result := f(READ, subKey, page, args...)
-	if result.Error != nil {
-		return result.Error
+	// 缓存方法调用，调用成功设置缓存数据
+	if result := f(READ, subKey, page, args...); result.Error != nil {
+		return fmt.Errorf("PageCall SET Error1:%s", result.Error)
 	} else if result.Data == nil {
-		return errors.New("缓存数据不能为空")
+		return fmt.Errorf("PageCall SET Error2:%s", "缓存数据不能为空")
+	} else if jsonData, err := json.Marshal(result.Data); err != nil {
+		return fmt.Errorf("PageCall SET Error3:%s", err)
+	} else if err := rdb.HSet(ctx, key, hashKey, jsonData).Err(); err != nil {
+		return fmt.Errorf("PageCall SET Error4:%s", err)
+	} else if err := rdb.Expire(ctx, key, expire).Err(); err != nil {
+		return fmt.Errorf("PageCall SET Error5:%s", err)
+	} else if err := json.Unmarshal(jsonData, data); err != nil {
+		return fmt.Errorf("PageCall SET Error6:%s", err)
 	}
-	// 缓存设置
-	json_data, err := json.Marshal(result.Data)
-	if err != nil {
-		return err
-	}
-	if result.Expire > 0 {
-		err = rdb.HSet(ctx, key, hash_key, json_data).Err()
-		if err != nil {
-			return fmt.Errorf("PageCache Set Error:%s\n", err)
-		}
-		err = rdb.Expire(ctx, key, time.Duration(result.Expire)*time.Second).Err()
-		if err != nil {
-			return fmt.Errorf("PageCache Exp Error:%s\n", err)
-		}
-	}
-	// 反序列化赋值
-	err = json.Unmarshal(json_data, data)
-	if err != nil {
-		return err
-	}
-	// 结果返回
 	return nil
 }

@@ -2,10 +2,10 @@ package storage
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/icodefans/go-extend/function"
 	"github.com/syyongx/php2go"
 )
 
@@ -67,7 +67,7 @@ func (aliyun Aliyun) UploadLoclFile(savePath, filePath string) (objectKey string
 	if savePath != "" {
 		saveDir += strings.Trim(savePath, "/") + "/"
 	}
-	fileName := php2go.Uniqid("") + strings.ToLower(filepath.Ext(filePath))
+	fileName := php2go.Uniqid("") + strings.ToLower(function.FileGetExt(filePath))
 	objectKey = fmt.Sprint(saveDir, fileName)
 
 	// 开始文件上传

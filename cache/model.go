@@ -19,12 +19,11 @@ const (
 
 // 缓存结果
 type Result struct {
-	Data   any
 	Key    string
 	Expire uint32
-	// Close  bool
-	Redis redis.Redis
-	Error error
+	Redis  redis.Redis
+	Error  error
+	Data   any
 }
 
 // 分页参数

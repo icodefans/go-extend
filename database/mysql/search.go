@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/syyongx/php2go"
 	"github.com/icodefans/go-extend/function"
+	"github.com/syyongx/php2go"
 )
 
 // 搜索结构
@@ -23,7 +23,7 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 		return "", nil, fmt.Errorf("where字段限制不能为空")
 	}
 	var (
-		operator = []string{"=", "<", ">", "<>", "<=", ">=", "is", "in", "not in", "like", "find_in_set", "overlaps"}
+		operator = []string{"=", "<", ">", "<>", "<=", ">=", "is", "in", "not in", "like", "find_in_set", "overlaps", "search"}
 	)
 	for _, item := range search.Where {
 		var (
@@ -68,14 +68,19 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 			field = ""
 			vals = append(vals, item[2])
 		} else if action == "overlaps" {
-			wen = ""
-			action = ""
+			wen, action = "", ""
 			field = fmt.Sprintf(`JSON_OVERLAPS(%s,?)=1 `, field)
 			if val, err := json.Marshal(item[2]); err == nil {
 				vals = append(vals, val)
 			} else {
 				vals = append(vals, item[2])
 			}
+		} else if fileds := strings.Split(field, "->"); action == "search" && len(fileds) == 2 {
+			wen, action = "", ""
+			subField := strings.Trim(fileds[1], `'`)
+			subField = strings.TrimLeft(subField, "$.")
+			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_SEARCH(%s, 'one', ?, NULL, '$[*].%s') IS NOT NULL`, fileds[0], fileds[0], subField)
+			vals = append(vals, item[2])
 		} else {
 			field = fmt.Sprintf("%s ", field)
 			vals = append(vals, item[2])
@@ -101,7 +106,7 @@ func (search *Search) ExtendParse(extendField string) (whereSQL string, vals []a
 		} else if !function.InArrayString(item[1], operator) {
 			return "", nil, fmt.Errorf("where不支持该操作符:%v", item[1])
 		}
-		item[0] = fmt.Sprintf("%s->'$.%s'", extendField, item[0])
+		item[0] = fmt.Sprintf("`%s`->'$.%s'", extendField, item[0])
 		if whereSQL != "" {
 			whereSQL += " AND "
 		}
@@ -134,12 +139,6 @@ func (search *Search) OrderParse(fields ...string) (orderSQL string, err error) 
 			return "", fmt.Errorf("order操作符不在选择范围内[asc,desc]")
 		} else if len(fields) > 0 && !php2go.InArray(item[0], fields) {
 			return "", fmt.Errorf("order不支持该字段:%v", item[0])
-		} else if field := strings.Split(item[0], "."); len(field) > 2 {
-			return "", fmt.Errorf("字段点分隔不符合规范:%v", item[0])
-		} else if len(field) == 1 {
-			item[0] = fmt.Sprintf("`%s`", item[0])
-		} else if len(field) == 2 {
-			item[0] = fmt.Sprintf("`%s`.`%s`", field[0], field[1])
 		}
 		if orderSQL != "" {
 			orderSQL += " , "
@@ -164,3 +163,22 @@ func (search *Search) LikeParse(keyword string, fields ...string) (likeSQL strin
 	return strings.Join(likeFields, " OR ")
 }
 
+// 自定义where字段提取到新的search
+func (search *Search) WherePluck(s *Search, fields ...string) *Search {
+	for _, value := range search.Where {
+		if name, ok := value[0].(string); ok && php2go.InArray(name, fields) {
+			s.Where = append(s.Where, value)
+		}
+	}
+	return s
+}
+
+// 自定义order字段提取到新的search
+func (search *Search) OrderPluck(s *Search, fields ...string) *Search {
+	for _, value := range search.Order {
+		if php2go.InArray(value[0], fields) {
+			s.Order = append(s.Order, value)
+		}
+	}
+	return s
+}

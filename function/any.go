@@ -1,6 +1,7 @@
 package function
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -16,4 +17,15 @@ func IsNil(v any) bool {
 	default:
 		return v == nil
 	}
+}
+
+// Any变量类型信息打印
+func AnyTypePrint(val any) {
+	// 获取反射类型对象
+	t := reflect.TypeOf(val)
+	fmt.Println("变量类型为:", t)
+	// 获取反射值对象
+	v := reflect.ValueOf(val)
+	fmt.Println("变量值为:", v)
+	fmt.Println("变量值的类型为:", v.Type())
 }

@@ -240,7 +240,7 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 	tableColumns = make(map[string][]column)
 	// sql
 	var sqlStr = `SELECT COLUMN_NAME,DATA_TYPE,COLUMN_TYPE,IS_NULLABLE,TABLE_NAME,CHARACTER_MAXIMUM_LENGTH,COLUMN_COMMENT
-		FROM information_schema.COLUMNS
+		FROM information_schema.COLUMNS 
 		WHERE table_schema = DATABASE()`
 	// 是否指定了具体的table
 	if t.table != "" {
@@ -268,7 +268,6 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 
 		// col.Json = strings.ToLower(col.ColumnName)
 		col.Tag = col.ColumnName
-		col.ColumnComment = col.ColumnComment
 		col.ColumnName = t.camelCase(col.ColumnName)
 		if val, ok := typeForMysqlToGo[col.ColumnType]; ok {
 			col.DataType = val
@@ -291,11 +290,14 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 			// }
 		}
 		if t.enableJsonTag && col.DataType == "string" {
-			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty,min=0,max=%d\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.CharMaxLen, col.ColumnComment)
+			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
+			// col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty,min=0,max=%d\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.CharMaxLen, col.ColumnComment)
 		} else if t.enableJsonTag && col.DataType == "uint64" {
-			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s,string\" validate:\"omitempty\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
+			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s,string\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
+			// col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s,string\" validate:\"omitempty\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
 		} else if t.enableJsonTag {
-			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
+			col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
+			// col.Tag = fmt.Sprintf("`%s:\"column:%s\" json:\"%s\" validate:\"omitempty\" label:\"%s\"`", t.tagKey, col.Tag, col.Tag, col.ColumnComment)
 		} else {
 			col.Tag = fmt.Sprintf("`%s:\"column:%s\"`", t.tagKey, col.Tag)
 		}

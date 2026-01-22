@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"strings"
 )
 
 // 扩展数据
@@ -18,5 +19,12 @@ func (t Extend) Value() (driver.Value, error) {
 
 // Scan 读取数据的时候转换为json
 func (t *Extend) Scan(value any) error {
-	return json.Unmarshal(value.([]byte), &t)
+	if val, ok := value.([]byte); !ok {
+		return nil
+	} else {
+		decoder := json.NewDecoder(strings.NewReader(string(val)))
+		decoder.UseNumber()
+		return decoder.Decode(&t)
+		// return json.Unmarshal(value.([]byte), &t)
+	}
 }

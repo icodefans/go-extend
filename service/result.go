@@ -24,6 +24,12 @@ func (rs Result) String() []byte {
 	return jsonStr
 }
 
+// 结构转JONS字符串
+func (rs Result) Byte() []byte {
+	jsonStr, _ := json.Marshal(rs)
+	return jsonStr
+}
+
 // 获取错误信息
 func (rs Result) GetError() error {
 	return fmt.Errorf(rs.Message)

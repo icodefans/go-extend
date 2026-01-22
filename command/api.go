@@ -5,5 +5,5 @@ import (
 )
 
 func ApiServerStart(serverKey string) {
-    service.Success("api server start", serverKey)
+	service.Success("api server start", serverKey)
 }

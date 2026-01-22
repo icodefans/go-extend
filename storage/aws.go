@@ -7,13 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/icodefans/go-extend/function"
 	"github.com/syyongx/php2go"
 )
 
@@ -67,7 +67,7 @@ func (config Aws) UploadLoclFile(savePath, filePath string) (objectKey string, d
 	if savePath != "" {
 		saveDir += strings.Trim(savePath, "/") + "/"
 	}
-	fileName := php2go.Uniqid("") + strings.ToLower(filepath.Ext(filePath))
+	fileName := php2go.Uniqid("") + strings.ToLower(function.FileGetExt(filePath))
 	objectKey = fmt.Sprint(saveDir, fileName)
 	// 读取文件流
 	res := Read(filePath)

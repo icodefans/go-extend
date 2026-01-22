@@ -2,12 +2,11 @@ package storage
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/syyongx/php2go"
 	"github.com/icodefans/go-extend/function"
+	"github.com/syyongx/php2go"
 )
 
 // 本地存储
@@ -46,7 +45,7 @@ func (aliyun *Disk) UploadLoclFile(savePath, filePath string) (objectKey string,
 	savePath = fmt.Sprintf("%s%s/%s/", saveRoot, savePath, DateDir)
 	BucketPath = fmt.Sprintf("%s/%s", BucketPath, savePath)
 
-	fileName := php2go.Uniqid("") + strings.ToLower(filepath.Ext(filePath))
+	fileName := php2go.Uniqid("") + strings.ToLower(function.FileGetExt(filePath))
 	objectKey = fmt.Sprint(savePath, fileName)
 	copyPath := fmt.Sprint(BucketPath, fileName)
 

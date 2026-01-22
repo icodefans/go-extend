@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/icodefans/go-extend/service"
-	v3 "github.com/robfig/cron"
+	cron_v3 "github.com/robfig/cron/v3"
 )
 
 type cron struct {
@@ -59,18 +59,17 @@ func (w *cron) Add(group, spec string, hander cronHander) {
 // 定时任务运行
 func (w *cron) Run(group string) {
 	ctx, cancel := context.WithCancel(context.Background())
-	c := v3.New()
+	c := cron_v3.New()
 	for _, value := range w.router {
 		if value.group != group {
 			continue
-		} else if err := c.AddJob(value.spec, cronJob{
+		} else if _, err := c.AddJob(value.spec, cronJob{
 			hander: value.hander,
 			ctx:    &ctx,
 		}); err != nil {
 			log.Printf("Job Spec (%s,%s)配置错误:%s", value.group, value.spec, err)
 		}
 	}
-	// 上下文取消控制
 	c.Start()
 
 	// 监听进程退出信号(TERM, HUP, INT, QUIT, KILL, USR1, or USR2)
