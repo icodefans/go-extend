@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -30,7 +31,7 @@ type Http struct {
 func (h *Http) Call(payload, resData any) (err error) {
 	// 参数验证
 	if err = validate.Validate(h); err != nil {
-		return err
+		return fmt.Errorf("http Validation Error %s", err.Error())
 	}
 	// 请求body参数设置
 	var reqBody io.Reader
@@ -63,12 +64,13 @@ func (h *Http) Call(payload, resData any) (err error) {
 		return fmt.Errorf("HttpCall client.DoErr %s", err)
 	}
 	// 请求结果获取
-	defer func(Body io.ReadCloser) { err = Body.Close() }(res.Body)
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(res.Body)
 	if resData == nil {
 		// break
 	} else if resBody, err := io.ReadAll(res.Body); err != nil {
 		return fmt.Errorf("HttpCall io.ReadAllErr %s", err)
 	} else if err := json.Unmarshal(resBody, &resData); err != nil {
+		log.Println(string(resBody))
 		return fmt.Errorf("HttpCall json.UnmarshalErr %s", err)
 	}
 	return err
