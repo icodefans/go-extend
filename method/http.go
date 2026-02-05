@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -62,6 +61,8 @@ func (h *Http) Call(payload, resData any) (err error) {
 	// 请求发起
 	if res, err = client.Do(req); err != nil {
 		return fmt.Errorf("HttpCall client.DoErr %s", err)
+	} else if res.StatusCode >= 300 {
+		return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
 	}
 	// 请求结果获取
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(res.Body)
@@ -70,7 +71,7 @@ func (h *Http) Call(payload, resData any) (err error) {
 	} else if resBody, err := io.ReadAll(res.Body); err != nil {
 		return fmt.Errorf("HttpCall io.ReadAllErr %s", err)
 	} else if err := json.Unmarshal(resBody, &resData); err != nil {
-		log.Println(string(resBody))
+		fmt.Println("json.Unmarshal resBody:", string(resBody))
 		return fmt.Errorf("HttpCall json.UnmarshalErr %s", err)
 	}
 	return err
