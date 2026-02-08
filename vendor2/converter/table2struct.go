@@ -269,7 +269,11 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 		// col.Json = strings.ToLower(col.ColumnName)
 		col.Tag = col.ColumnName
 		col.ColumnName = t.camelCase(col.ColumnName)
-		if val, ok := typeForMysqlToGo[col.ColumnType]; ok {
+		columnType := col.ColumnType
+		if strings.Contains(col.ColumnType, "unsigned") {
+			columnType = fmt.Sprintf("%s %s", col.DataType, "unsigned")
+		}
+		if val, ok := typeForMysqlToGo[columnType]; ok {
 			col.DataType = val
 		} else {
 			col.DataType = typeForMysqlToGo[col.DataType]
