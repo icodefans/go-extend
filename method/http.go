@@ -61,7 +61,7 @@ func (h *Http) Call(payload, resData any) (err error) {
 	// 请求发起
 	if res, err = client.Do(req); err != nil {
 		return fmt.Errorf("HttpCall client.DoErr %s", err)
-	} else if res.StatusCode >= 300 {
+	} else if res.StatusCode >= 500 {
 		return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
 	}
 	// 请求结果获取
