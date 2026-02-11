@@ -70,8 +70,10 @@ func (h *Http) Call(payload, resData any) (err error) {
 		// break
 	} else if resBody, err := io.ReadAll(res.Body); err != nil {
 		return fmt.Errorf("HttpCall io.ReadAllErr %s", err)
-	} else if err := json.Unmarshal(resBody, &resData); err != nil {
-		fmt.Println("json.Unmarshal resBody:", string(resBody))
+	} else if err := json.Unmarshal(resBody, &resData); err != nil && res.StatusCode != 200 {
+		return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
+	} else if err != nil {
+		// fmt.Println("json.Unmarshal resBody:", string(resBody))
 		return fmt.Errorf("HttpCall json.UnmarshalErr %s", err)
 	}
 	return err
