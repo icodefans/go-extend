@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/icodefans/go-extend/service"
 	cron_v3 "github.com/robfig/cron/v3"
@@ -81,6 +80,6 @@ func (w *cron) Run(group string) {
 	cancel()
 
 	// 预留时间，执行收尾操作
-	time.Sleep(3 * time.Second)
+	// time.Sleep(3 * time.Second)
 	service.Success(fmt.Sprintf("程序退出，接收到信号:%s", sig.String()), nil, "dev")
 }
