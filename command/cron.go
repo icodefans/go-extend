@@ -82,5 +82,6 @@ func (w *cron) Run(group string) {
 
 	// 预留时间，执行收尾操作
 	time.Sleep(3 * time.Second)
-	service.Success(fmt.Sprintf("程序退出，接收到信号:%s", sig.String()), nil, "info")
+	fmt.Printf("%s - cron server stop signal:%s\n\n", time.Now().Format(`2006/01/02 15:04:05`), sig.String())
+	// service.Success(fmt.Sprintf("程序退出，接收到信号:%s", sig.String()), nil, "info")
 }
