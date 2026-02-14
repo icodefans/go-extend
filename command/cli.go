@@ -57,5 +57,5 @@ func (w *cli) Match(rule string) (result *service.Result) {
 
 	// 预留时间，执行收尾操作
 	time.Sleep(5 * time.Second)
-	return service.Success("收尾成功，程序退出，执行完成", []any{fmt.Sprintf("接收到信号:%s", sig.String())}, "dev")
+	return service.Success("收尾成功，程序退出，执行完成", []any{fmt.Sprintf("接收到信号:%s", sig.String())}, "info")
 }
