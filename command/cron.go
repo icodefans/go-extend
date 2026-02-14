@@ -82,12 +82,12 @@ func (w *cron) Run(group string) {
 		if value.sync != 1 {
 			// next
 		} else if _, err := c.AddJob(value.spec, syncChain.Then(myJob)); err != nil {
-			log.Printf("Job Spec (%s,%s)同步1配置错误:%s", value.group, value.spec, err)
+			log.Printf("Job Spec (%s,%s)同步1任务配置错误:%s", value.group, value.spec, err)
 		}
 		if value.sync != 2 {
 			// next
 		} else if _, err := c.AddJob(value.spec, skipChain.Then(myJob)); err != nil {
-			log.Printf("Job Spec (%s,%s)同步2配置错误:%s", value.group, value.spec, err)
+			log.Printf("Job Spec (%s,%s)同步2任务配置错误:%s", value.group, value.spec, err)
 		}
 	}
 	c.Start()
