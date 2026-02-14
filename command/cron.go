@@ -82,5 +82,5 @@ func (w *cron) Run(group string) {
 
 	// 预留时间，执行收尾操作
 	time.Sleep(3 * time.Second)
-	service.Success(fmt.Sprintf("程序退出，接收到信号:%s", sig.String()), nil, "dev")
+	service.Success(fmt.Sprintf("程序退出，接收到信号:%s", sig.String()), nil, "info")
 }
