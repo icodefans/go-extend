@@ -17,6 +17,7 @@ type cron struct {
 	router []struct {
 		group  string     // 业务分组
 		spec   string     // 间隔时长
+		async  bool       // 异步执行
 		hander cronHander // 处理程序
 	}
 }
@@ -44,30 +45,42 @@ func Cron() *cron {
 }
 
 // 增加路由配置
-func (w *cron) Add(group, spec string, hander cronHander) {
+func (w *cron) Add(group, spec string, async bool, hander cronHander) {
 	w.router = append(w.router, struct {
 		group  string
 		spec   string
+		async  bool
 		hander cronHander
 	}{
 		group,
 		spec,
+		async,
 		hander,
 	})
 }
 
 // 定时任务运行
 func (w *cron) Run(group string) {
+	// 创建基础 cron 实例（仅启用秒级，不设置全局执行链）
+	c := cron_v3.New(cron_v3.WithSeconds())
+	// 自定义同步链：DelayIfStillRunning（等待上一个任务完成）
+	syncChain := cron_v3.NewChain(cron_v3.DelayIfStillRunning(cron_v3.DefaultLogger))
+
 	ctx, cancel := context.WithCancel(context.Background())
-	c := cron_v3.New()
 	for _, value := range w.router {
 		if value.group != group {
 			continue
-		} else if _, err := c.AddJob(value.spec, cronJob{
-			hander: value.hander,
-			ctx:    &ctx,
-		}); err != nil {
-			log.Printf("Job Spec (%s,%s)配置错误:%s", value.group, value.spec, err)
+		}
+		myJob := cronJob{hander: value.hander, ctx: &ctx}
+		if !value.async {
+			// next
+		} else if _, err := c.AddJob(value.spec, myJob); err != nil {
+			log.Printf("Job Spec (%s,%s)异步任务配置错误:%s", value.group, value.spec, err)
+		}
+		if value.async {
+			// next
+		} else if _, err := c.AddJob(value.spec, syncChain.Then(myJob)); err != nil {
+			log.Printf("Job Spec (%s,%s)同步配置错误:%s", value.group, value.spec, err)
 		}
 	}
 	c.Start()
