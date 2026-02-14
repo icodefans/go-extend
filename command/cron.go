@@ -77,6 +77,9 @@ func (w *cron) Run(group string) {
 	signal.Notify(s, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGUSR2)
 	sig := <-s
 
+	// 停止 cron（可选，优雅退出）
+	c.Stop()
+
 	// 进程上下文取消
 	cancel()
 
