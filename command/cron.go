@@ -62,7 +62,8 @@ func (w *cron) Add(group, spec string, sync uint8, hander cronHander) {
 // 定时任务运行
 func (w *cron) Run(group string) {
 	// 创建基础 cron 实例（仅启用秒级，不设置全局执行链）
-	c := cron_v3.New(cron_v3.WithSeconds())
+	// c := cron_v3.New(cron_v3.WithSeconds())
+	c := cron_v3.New()
 	// 自定义同步链：DelayIfStillRunning（等待上一个任务完成）
 	syncChain := cron_v3.NewChain(cron_v3.DelayIfStillRunning(cron_v3.DefaultLogger))
 	// 自定义同步链：SkipIfStillRunning（上一个未完成则跳过）
