@@ -24,8 +24,8 @@ type markdown struct {
 	Text  string `json:"text"`
 }
 type at struct {
-	AtMobiles string `json:"atMobiles"`
-	IsAtAll   bool   `json:"isAtAll"`
+	AtMobiles []string `json:"atMobiles"`
+	IsAtAll   bool     `json:"isAtAll"`
 }
 type dingTalkData struct {
 	MsgType  string   `json:"msgtype"`
@@ -50,10 +50,13 @@ func (config *DingTalk) Markdown(title, text, atMobiles string, isAtAll bool) (s
 			Text:  text,
 		},
 		At: at{
-			AtMobiles: atMobiles,
-			IsAtAll:   isAtAll,
+			IsAtAll: isAtAll,
 		},
 	}
+	if atMobiles != "" {
+		data.At.AtMobiles = strings.Split(atMobiles, ",")
+	}
+	fmt.Println(data)
 	json_data, _ := json.Marshal(data)
 
 	// 签名字符串
