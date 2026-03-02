@@ -56,8 +56,10 @@ func (config *DingTalk) Markdown(title, text, atMobiles string, isAtAll bool) (s
 	if atMobiles != "" {
 		data.At.AtMobiles = strings.Split(atMobiles, ",")
 	}
-	fmt.Println(data)
-	json_data, _ := json.Marshal(data)
+	json_data, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
 
 	// 签名字符串
 	timestamp := time.Now().UnixNano() / 1e6
