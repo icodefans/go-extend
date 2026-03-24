@@ -112,6 +112,22 @@ func (r *Redis) StreamXAck(streamKey string, groupName string, vecMsgId []string
 	return nil
 }
 
+// pending消息自动认领
+func (r *Redis) StreamXAutoClaim(streamKey string, groupName, consumerName string, minIdle uint32, start string, count int64) (err error) {
+	conn, ctx, _ := r.Connect()
+	if _, _, err := conn.XAutoClaim(ctx, &redis.XAutoClaimArgs{
+		Stream:   streamKey,
+		Group:    groupName,
+		Consumer: consumerName,                         // 认领给consumer2
+		MinIdle:  time.Second * time.Duration(minIdle), // 空闲超过5秒的消息
+		Start:    start,                                // 游标初始值（固定传0）
+		Count:    count,                                // 单次最多认领10条
+	}).Result(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // 队列消费组消费者清理
 func (r *Redis) StreamCleanup(stream string, config StreamCleanupConfig) error {
 	groups, err := r.XInfoGroups(*r.Ctx, stream).Result()
