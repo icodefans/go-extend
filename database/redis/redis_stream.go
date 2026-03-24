@@ -30,7 +30,7 @@ func (r *Redis) StreamMessageByGroupConsumer(streamKey string, groupName string,
 	if result, err = conn.XReadGroup(ctx, &redis.XReadGroupArgs{
 		Group:    groupName,                               // 消费者组的名称，用于标识一组协同工作的消费者。
 		Consumer: consumerName,                            // 当前执行读取操作的消费者名称，在消费者组中唯一标识该消费者。
-		Streams:  []string{streamKey, "0"},                // <key>：流的名称，可以指定多个流，以实现从多个流中同时读取消息。<id>：每个流对应的起始消息 ID，通常使用 > 表示从流中未被消费者组处理过的最新消息开始读取。0 表示从消费组未处理的最早消息开始读，包含 PEL 中的消息
+		Streams:  []string{streamKey, ">"},                // <key>：流的名称，可以指定多个流，以实现从多个流中同时读取消息。<id>：每个流对应的起始消息 ID，通常使用 > 表示从流中未被消费者组处理过的最新消息开始读取。0 表示从消费组未处理的最早消息开始读，包含 PEL 中的消息
 		Count:    count,                                   // 指定每次读取的最大消息数量。若不指定，Redis 会尝试读取尽可能多的消息。
 		Block:    time.Millisecond * time.Duration(block), // 若设置为 0，则表示无限期阻塞，直到有新消息到来；若在指定时间内没有新消息，命令将返回空结果
 		NoAck:    noAck,                                   // 读取消息后，会自动将其放入 Pending（等待）列表，等待消费者显式地发送 XACK 命令进行确认
