@@ -12,12 +12,13 @@ func (config *MySQL) Table2Struct(tableName string) (structContent string, err e
 		return structContent, fmt.Errorf("表名不能为空")
 	}
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&allowCleartextPasswords=%d",
 		config.UserName,
 		config.PassWord,
 		config.HostName,
 		config.HostPort,
 		config.DataBase,
+		config.AllowCleartextPasswords,
 	)
 	savePath := fmt.Sprintf("./runtime/model/%s.go", tableName)
 
