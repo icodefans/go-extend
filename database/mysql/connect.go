@@ -42,10 +42,10 @@ func (config *MySQL) Connect() (gormDb *gorm.DB) {
 	// 数据库连接
 	var err error
 	if config.gormDb, err = gorm.Open(mysql.Open(fmt.Sprintf( // 连接配置
-		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms&allowCleartextPasswords=%d&interpolateParams=%t&parseTime=%t",
+		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms&allowCleartextPasswords=%d&interpolateParams=%t",
 		config.UserName, config.PassWord, config.HostName, config.HostPort,
 		config.DataBase, config.Charset, config.Timeout, config.AllowCleartextPasswords,
-		config.InterpolateParams, config.ParseTime,
+		config.InterpolateParams,
 	)), &gorm.Config{ // GORM配置
 		SkipDefaultTransaction: true,  // 禁用默认事务
 		PrepareStmt:            false, // 缓存 Prepared Statement
