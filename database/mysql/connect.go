@@ -15,20 +15,21 @@ import (
 
 // MySQL配置
 type MySQL struct {
-	HostName        string `mapstructure:"HostName"`        // 服务器地址
-	HostPort        string `mapstructure:"HostPort"`        // 端口
-	DataBase        string `mapstructure:"DataBase"`        // 数据库名
-	UserName        string `mapstructure:"UserName"`        // 用户名
-	PassWord        string `mapstructure:"PassWord"`        // 密码
-	Charset         string `mapstructure:"Charset"`         // 数据库编码默认采用utf8
-	Prefix          string `mapstructure:"Prefix"`          // 数据库表前缀
-	Timeout         int    `mapstructure:"Timeout"`         // 设置最大打开的连接数，默认值为0表示不限制
-	MaxOpenConns    int    `mapstructure:"MaxOpenConns"`    // 设置最大打开的连接数，避免连接过多导致数据库压力过大
-	MaxIdleConns    int    `mapstructure:"MaxIdleConns"`    // 设置连接池中的最大闲置连接数
-	ConnMaxLifetime int    `mapstructure:"ConnMaxLifetime"` // 设置连接的最大生存期，防止使用过期连接(单位秒)
-	ConnMaxIdleTime int    `mapstructure:"ConnMaxIdleTime"` // 设置连接在闲置状态的最大存活时间(单位秒)
-	LogLevel        int    `mapstructure:"LogLevel"`        // SQL日志级别(Silent:1, Error:2, Warn:3, Info:4)
-	gormDb          *gorm.DB
+	HostName                string `mapstructure:"HostName"`                // 服务器地址
+	HostPort                string `mapstructure:"HostPort"`                // 端口
+	DataBase                string `mapstructure:"DataBase"`                // 数据库名
+	UserName                string `mapstructure:"UserName"`                // 用户名
+	PassWord                string `mapstructure:"PassWord"`                // 密码
+	Charset                 string `mapstructure:"Charset"`                 // 数据库编码默认采用utf8
+	Prefix                  string `mapstructure:"Prefix"`                  // 数据库表前缀
+	Timeout                 int    `mapstructure:"Timeout"`                 // 设置最大打开的连接数，默认值为0表示不限制
+	MaxOpenConns            int    `mapstructure:"MaxOpenConns"`            // 设置最大打开的连接数，避免连接过多导致数据库压力过大
+	MaxIdleConns            int    `mapstructure:"MaxIdleConns"`            // 设置连接池中的最大闲置连接数
+	ConnMaxLifetime         int    `mapstructure:"ConnMaxLifetime"`         // 设置连接的最大生存期，防止使用过期连接(单位秒)
+	ConnMaxIdleTime         int    `mapstructure:"ConnMaxIdleTime"`         // 设置连接在闲置状态的最大存活时间(单位秒)
+	LogLevel                int    `mapstructure:"LogLevel"`                // SQL日志级别(Silent:1, Error:2, Warn:3, Info:4)
+	AllowCleartextPasswords int    `mapstructure:"AllowCleartextPasswords"` // 允许使用明文密码认证(0:否,1:是)
+	gormDb                  *gorm.DB
 }
 
 func (config *MySQL) Connect() (gormDb *gorm.DB) {
@@ -39,9 +40,9 @@ func (config *MySQL) Connect() (gormDb *gorm.DB) {
 	// 数据库连接
 	var err error
 	if config.gormDb, err = gorm.Open(mysql.Open(fmt.Sprintf( // 连接配置
-		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms",
+		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms&allowCleartextPasswords=%d",
 		config.UserName, config.PassWord, config.HostName, config.HostPort,
-		config.DataBase, config.Charset, config.Timeout,
+		config.DataBase, config.Charset, config.Timeout, config.AllowCleartextPasswords,
 	)), &gorm.Config{ // GORM配置
 		SkipDefaultTransaction: true,  // 禁用默认事务
 		PrepareStmt:            false, // 缓存 Prepared Statement
