@@ -29,6 +29,8 @@ type MySQL struct {
 	ConnMaxIdleTime         int    `mapstructure:"ConnMaxIdleTime"`         // 设置连接在闲置状态的最大存活时间(单位秒)
 	LogLevel                int    `mapstructure:"LogLevel"`                // SQL日志级别(Silent:1, Error:2, Warn:3, Info:4)
 	AllowCleartextPasswords int    `mapstructure:"AllowCleartextPasswords"` // 允许使用明文密码认证(0:否,1:是)
+	InterpolateParams       bool   `mapstructure:"InterpolateParams"`       // 让驱动本地拼接 SQL，不发送 Prepare 请求
+	ParseTime               bool   `mapstructure:"ParseTime"`               // 正确处理时间格式
 	gormDb                  *gorm.DB
 }
 
@@ -40,9 +42,10 @@ func (config *MySQL) Connect() (gormDb *gorm.DB) {
 	// 数据库连接
 	var err error
 	if config.gormDb, err = gorm.Open(mysql.Open(fmt.Sprintf( // 连接配置
-		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms&allowCleartextPasswords=%d",
+		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local&timeout=%dms&allowCleartextPasswords=%d&interpolateParams=%t&parseTime=%t",
 		config.UserName, config.PassWord, config.HostName, config.HostPort,
 		config.DataBase, config.Charset, config.Timeout, config.AllowCleartextPasswords,
+		config.InterpolateParams, config.ParseTime,
 	)), &gorm.Config{ // GORM配置
 		SkipDefaultTransaction: true,  // 禁用默认事务
 		PrepareStmt:            false, // 缓存 Prepared Statement
