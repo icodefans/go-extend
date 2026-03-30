@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/icodefans/go-extend/function"
 	"github.com/syyongx/php2go"
+	"gorm.io/gorm"
 )
 
 // 搜索结构
@@ -55,6 +57,13 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 		} else if len(fff) == 2 {
 			field = fmt.Sprintf("`%s`.`%s`", fff[0], fff[1])
 		}
+
+		// 兼容值是字段类型
+		if value, ok := item[2].(string); ok && regexp.MustCompile("^`[^`]*`$").MatchString(value) {
+			item[2] = gorm.Expr(fmt.Sprintf("%s", value))
+		}
+
+		// 字段值匹配设置
 		if _, ok = item[2].([]any); ok && (action == "in" || action == "not in") {
 			wen = " (?)"
 			field = fmt.Sprintf("%s ", field)
