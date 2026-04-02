@@ -26,7 +26,7 @@ type ResultError struct {
 
 // 实现 error 接口
 func (e *ResultError) Error() string {
-	return fmt.Sprintf("错误[%d]: %s", e.Code, e.Message)
+	return fmt.Sprintf("ErrorCode[%d]: %s", e.Code, e.Message)
 }
 
 // 结构转JONS字符串
