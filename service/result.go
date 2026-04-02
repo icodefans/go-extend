@@ -18,6 +18,17 @@ type Result struct {
 	Data    any    `json:"data"`
 }
 
+// 自定义错误（带业务码）
+type ResultError struct {
+	Code    int
+	Message string
+}
+
+// 实现 error 接口
+func (e *ResultError) Error() string {
+	return fmt.Sprintf("错误[%d]: %s", e.Code, e.Message)
+}
+
 // 结构转JONS字符串
 func (rs Result) String() []byte {
 	jsonStr, _ := json.Marshal(rs)
@@ -32,7 +43,7 @@ func (rs Result) Byte() []byte {
 
 // 获取错误信息
 func (rs Result) GetError() error {
-	return fmt.Errorf(rs.Message)
+	return &ResultError{Code: rs.Error, Message: rs.Message}
 }
 
 // 结果数据结构
