@@ -275,8 +275,8 @@ func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]co
 		}
 		if val, ok := typeForMysqlToGo[columnType]; ok {
 			col.DataType = val
-		} else {
-			col.DataType = typeForMysqlToGo[col.DataType]
+		} else if val, ok = typeForMysqlToGo[col.DataType]; ok {
+			col.DataType = val
 		}
 
 		// 字段首字母本身大写, 是否需要删除tag
