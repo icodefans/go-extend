@@ -62,7 +62,7 @@ func (h *Http) Call(payload, resData any) (err error) {
 	if res, err = client.Do(req); err != nil {
 		return fmt.Errorf("HttpCall client.DoErr %s", err)
 	} else if res.StatusCode >= 500 {
-		return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
+		// return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
 	}
 	// 请求结果获取
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(res.Body)
