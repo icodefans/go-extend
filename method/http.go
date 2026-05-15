@@ -71,7 +71,7 @@ func (h *Http) Call(payload, resData any) (err error) {
 	} else if resBody, err := io.ReadAll(res.Body); err != nil {
 		return fmt.Errorf("HttpCall io.ReadAllErr %s", err)
 	} else if err := json.Unmarshal(resBody, &resData); err != nil && res.StatusCode != 200 {
-		return fmt.Errorf("HttpCall Err.StatusCode %s", res.Status)
+		return fmt.Errorf("HttpCall josn.UnmarshalErr.StatusCode %s", res.Status)
 	} else if err != nil {
 		// fmt.Println("json.Unmarshal resBody:", string(resBody))
 		return fmt.Errorf("HttpCall json.UnmarshalErr %s", err)
