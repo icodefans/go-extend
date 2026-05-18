@@ -20,10 +20,11 @@ import (
 
 // HTTP请求模块
 type Http struct {
-	Url     string            `json:"url" validate:"required,url" label:"地址"`
-	Method  string            `json:"method" validate:"required,oneof=GET POST PUT DELETE" label:"请求方式"`
-	Header  map[string]string `json:"header" validate:"omitempty" label:"请求头"`
-	Timeout uint32            `json:"timeout" validate:"omitempty" label:"超时时间,单位秒"`
+	Url       string            `json:"url" validate:"required,url" label:"地址"`
+	Method    string            `json:"method" validate:"required,oneof=GET POST PUT DELETE" label:"请求方式"`
+	Header    map[string]string `json:"header" validate:"omitempty" label:"请求头"`
+	Timeout   uint32            `json:"timeout" validate:"omitempty" label:"超时时间,单位秒"`
+	Transport *http.Transport   `json:"transport" validate:"omitempty" label:"代理服务器配置"`
 }
 
 // 请求发起
@@ -50,6 +51,9 @@ func (h *Http) Call(payload, resData any) (err error) {
 	var req *http.Request
 	var client = &http.Client{
 		Timeout: time.Duration(h.Timeout) * time.Second,
+	}
+	if h.Transport != nil {
+		client.Transport = h.Transport
 	}
 	if req, err = http.NewRequest(h.Method, h.Url, reqBody); err != nil {
 		return fmt.Errorf("HttpCall NewRequestErr %s", err)
