@@ -101,7 +101,7 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 		if fieldList := strings.Split(strings.ReplaceAll(field, "`", ""), "||"); len(fieldList) > 1 {
 			orSqlList := []string{}
 			for i, name := range fieldList {
-				orSqlList = append(orSqlList, fmt.Sprint(name, strings.ToUpper(action), wen))
+				orSqlList = append(orSqlList, fmt.Sprint(strings.TrimSpace(name), strings.ToUpper(action), wen))
 				if i > 0 {
 					vals = append(vals, vals[len(vals)-1])
 				}
