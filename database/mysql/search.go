@@ -97,7 +97,19 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 		if whereSQL != "" {
 			whereSQL += " AND "
 		}
-		whereSQL += fmt.Sprint(field, strings.ToUpper(action), wen)
+		// 支持字段或者逻辑
+		if fieldList := strings.Split(strings.ReplaceAll(field, "`", ""), "||"); len(fieldList) > 1 {
+			orSqlList := []string{}
+			for i, name := range fieldList {
+				orSqlList = append(orSqlList, fmt.Sprint(name, strings.ToUpper(action), wen))
+				if i > 0 {
+					vals = append(vals, vals[len(vals)-1])
+				}
+			}
+			whereSQL += fmt.Sprintf("(%s)", strings.Join(orSqlList, " OR "))
+		} else {
+			whereSQL += fmt.Sprint(field, strings.ToUpper(action), wen)
+		}
 	}
 	return whereSQL, vals, nil
 }
