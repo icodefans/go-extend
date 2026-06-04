@@ -22,7 +22,7 @@ type Search struct {
 // 自定义where条件解析逻辑
 func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any, err error) {
 	// fmt.Printf("%#v\n", search) // Go语法格式（最推荐看类型+值）
-	ParseSearchWhere(search.Where)
+	// ParseSearchWhere(search.Where)
 	if len(fields) == 0 {
 		return "", nil, fmt.Errorf("where字段限制不能为空")
 	}
