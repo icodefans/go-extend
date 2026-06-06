@@ -119,8 +119,9 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 				continue
 			}
 			// cond := `JSON_VALID(execute)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(execute,'$.items[*]' COLUMNS(space_min INT PATH '$.action.space_min')) t WHERE t.space_min > ?)`
+			//          JSON_VALID(execute)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(execute,'$.items[*]' COLUMNS(title INT PATH '$.title')) t WHERE t.title = '配置1')
 			field = fmt.Sprintf(
-				`JSON_VALID(%s)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(%s,'%s[*]' COLUMNS(%s INT PATH '$%s')) t WHERE t.%s %s ?)`,
+				`JSON_VALID(%s)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(%s,'%s[*]' COLUMNS(%s VARCHAR(2000) PATH '$%s')) t WHERE t.%s %s ?)`,
 				fileds[0], fileds[0], mainFields[0], subFields[len(subFields)-1], mainFields[1], subFields[len(subFields)-1], strings.ToUpper(action),
 			)
 			wen, action = "", ""
