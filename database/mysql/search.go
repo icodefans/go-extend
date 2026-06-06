@@ -26,9 +26,10 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 	if len(fields) == 0 {
 		return "", nil, fmt.Errorf("where字段限制不能为空")
 	}
-	var (
-		operator = []string{"=", "<", ">", "<>", "<=", ">=", "is", "in", "not in", "like", "find_in_set", "overlaps", "search"}
-	)
+	operator := []string{
+		"=", "<", ">", "<>", "<=", ">=", "is", "in", "not in", "like", "find_in_set",
+		"overlaps", "json_search", "json_number", "search",
+	}
 	for _, item := range search.Where {
 		var (
 			field  string // 字段
@@ -91,6 +92,19 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 			subField := strings.Trim(fileds[1], `'`)
 			subField = strings.TrimLeft(subField, "$.")
 			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_SEARCH(%s, 'one', ?, NULL, '$[*].%s') IS NOT NULL`, fileds[0], fileds[0], subField)
+			vals = append(vals, item[2])
+		} else if fileds := strings.Split(field, "->"); action == "json_search" && len(fileds) == 2 {
+			// 值是用字符串用这种方法
+			// JSON_VALID(execute) = 1 AND JSON_SEARCH(execute, 'one', '配置2', NULL, '$.items[*].title') IS NOT NULL
+			// execute->'$.items[*].title'
+			wen, action = "", ""
+			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_SEARCH(%s, 'one', ?, NULL, %s) IS NOT NULL`, fileds[0], fileds[0], fileds[1])
+			vals = append(vals, item[2])
+		} else if fileds := strings.Split(field, "->"); action == "json_number" && len(fileds) == 2 {
+			// 值是用数字用这种方法
+			// execute->'$.items[*].action.space_min'
+			wen, action = "", ""
+			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_CONTAINS(JSON_EXTRACT(%s,%s),CAST(? AS JSON))`, fileds[0], fileds[0], fileds[1])
 			vals = append(vals, item[2])
 		} else {
 			field = fmt.Sprintf("%s ", field)
