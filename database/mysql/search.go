@@ -28,7 +28,7 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 	}
 	operator := []string{
 		"=", "<", ">", "<>", "<=", ">=", "is", "in", "not in", "like", "find_in_set",
-		"overlaps", "json_search", "json_number", "search",
+		"overlaps", "json_search", "json_number", "json_table", "search",
 	}
 	for _, item := range search.Where {
 		var (
@@ -105,6 +105,25 @@ func (search *Search) WhereParse(fields ...string) (whereSQL string, vals []any,
 			// execute->'$.items[*].action.space_min'
 			wen, action = "", ""
 			field = fmt.Sprintf(`JSON_VALID(%s) = 1 AND JSON_CONTAINS(JSON_EXTRACT(%s,%s),CAST(? AS JSON))`, fileds[0], fileds[0], fileds[1])
+			vals = append(vals, item[2])
+		} else if len(strings.Split(field, "[*]")) == 2 { // json_table
+			// json 表格 支持值的比较
+			// execute->'$.items[*].action.space_min'
+			fileds := strings.Split(field, "->")
+			mainFields := strings.Split(strings.Trim(fileds[1], `'`), "[*]")
+			if len(mainFields) != 2 {
+				continue
+			}
+			subFields := strings.Split(mainFields[1], ".")
+			if len(subFields) == 0 {
+				continue
+			}
+			// cond := `JSON_VALID(execute)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(execute,'$.items[*]' COLUMNS(space_min INT PATH '$.action.space_min')) t WHERE t.space_min > ?)`
+			field = fmt.Sprintf(
+				`JSON_VALID(%s)=1 AND EXISTS(SELECT 1 FROM JSON_TABLE(%s,'%s[*]' COLUMNS(%s INT PATH '$%s')) t WHERE t.%s %s ?)`,
+				fileds[0], fileds[0], mainFields[0], subFields[len(subFields)-1], mainFields[1], subFields[len(subFields)-1], strings.ToUpper(action),
+			)
+			wen, action = "", ""
 			vals = append(vals, item[2])
 		} else {
 			field = fmt.Sprintf("%s ", field)
