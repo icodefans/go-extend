@@ -13,6 +13,7 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/icodefans/go-extend/function"
+	"github.com/shopspring/decimal"
 )
 
 // 全局数据验证器（默认中文语言包）
@@ -28,6 +29,8 @@ func Validate(args ...any) error {
 	if err := validate.RegisterValidation("time", CheckTime); err != nil {
 		return err
 	} else if err := validate.RegisterValidation("date", CheckDate); err != nil {
+		return err
+	} else if err := RegisterDecimalValidator(validate); err != nil {
 		return err
 	}
 
@@ -92,4 +95,69 @@ func CheckTime(fl validator.FieldLevel) bool {
 	pattern := `^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$`
 	result, _ := regexp.MatchString(pattern, value)
 	return result
+}
+
+// RegisterDecimalValidator 注册decimal大小比较校验标签
+func RegisterDecimalValidator(v *validator.Validate) error {
+	// gt_dec 大于
+	if err := v.RegisterValidation("gt_dec", func(fl validator.FieldLevel) bool {
+		val := fl.Field().Interface().(decimal.Decimal)
+		cmpVal, err := decimal.NewFromString(fl.Param())
+		if err != nil {
+			return false
+		}
+		return val.GreaterThan(cmpVal)
+	}); err != nil {
+		return err
+	}
+
+	// gte_dec 大于等于
+	if err := v.RegisterValidation("gte_dec", func(fl validator.FieldLevel) bool {
+		val := fl.Field().Interface().(decimal.Decimal)
+		cmpVal, err := decimal.NewFromString(fl.Param())
+		if err != nil {
+			return false
+		}
+		return val.GreaterThanOrEqual(cmpVal)
+	}); err != nil {
+		return err
+	}
+
+	// lt_dec 小于
+	if err := v.RegisterValidation("lt_dec", func(fl validator.FieldLevel) bool {
+		val := fl.Field().Interface().(decimal.Decimal)
+		cmpVal, err := decimal.NewFromString(fl.Param())
+		if err != nil {
+			return false
+		}
+		return val.LessThan(cmpVal)
+	}); err != nil {
+		return err
+	}
+
+	// lte_dec 小于等于
+	if err := v.RegisterValidation("lte_dec", func(fl validator.FieldLevel) bool {
+		val := fl.Field().Interface().(decimal.Decimal)
+		cmpVal, err := decimal.NewFromString(fl.Param())
+		if err != nil {
+			return false
+		}
+		return val.LessThanOrEqual(cmpVal)
+	}); err != nil {
+		return err
+	}
+
+	// eq_dec 等于（附加常用）
+	if err := v.RegisterValidation("eq_dec", func(fl validator.FieldLevel) bool {
+		val := fl.Field().Interface().(decimal.Decimal)
+		cmpVal, err := decimal.NewFromString(fl.Param())
+		if err != nil {
+			return false
+		}
+		return val.Equal(cmpVal)
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
