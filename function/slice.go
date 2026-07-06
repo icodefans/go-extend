@@ -19,3 +19,16 @@ func ReverseSliceNew[T any](s []T) []T {
 	}
 	return newSlice
 }
+
+// 泛型去重，T 必须是 comparable 类型（int/string/自定义可比较结构体）
+func SliceUnique[T comparable](slice []T) []T {
+	m := make(map[T]struct{}, len(slice))
+	result := make([]T, 0, len(slice))
+	for _, item := range slice {
+		if _, exists := m[item]; !exists {
+			m[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
+}
