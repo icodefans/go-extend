@@ -71,7 +71,7 @@ func (w *cron) Run(group string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	for _, value := range w.router {
-		if value.group != group {
+		if value.group != "all" && value.group != group {
 			continue
 		}
 		myJob := cronJob{hander: value.hander, ctx: &ctx}
