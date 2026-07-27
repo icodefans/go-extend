@@ -36,6 +36,12 @@ func (rs Result) String() []byte {
 }
 
 // 结构转JONS字符串
+func (rs Result) ToString() string {
+	jsonStr, _ := json.Marshal(rs)
+	return string(jsonStr)
+}
+
+// 结构转JONS字符串
 func (rs Result) Byte() []byte {
 	jsonStr, _ := json.Marshal(rs)
 	return jsonStr
